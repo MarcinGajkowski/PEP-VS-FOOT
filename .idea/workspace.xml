@@ -26,8 +26,47 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="remade the slapup gif">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_0.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_0.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_1.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_1.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_2.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_3.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_3.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Backward.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Backward.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_BackwardDash.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_BackwardDash.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_CrouchGuard.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_CrouchGuard.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Damage.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Damage.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Dead.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Dead.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Forward.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Forward.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_ForwardDash.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_ForwardDash.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_StandGuard.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_StandGuard.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Win.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Win.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/Idle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/Idle.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/backkick/backkick.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/backkick/backkick.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/fall2/fall2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/fall2/fall2.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/hurt/hurt.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/hurt/hurt.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/idle/idle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/idle/idle.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/jump/jump.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/jump/jump.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/jump2/jump2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/jump2/jump2.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/knock/knock.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/knock/knock.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/land/land.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/land/land.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/land2/land2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/land2/land2.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/machpunch/machpunch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/machpunch/machpunch.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/move/move.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/move/move.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza1/outofpizza1.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza1/outofpizza1.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza2/outofpizza2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza2/outofpizza2.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza3/outofpizza3.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza3/outofpizza3.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza4/outofpizza4.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza4/outofpizza4.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/shoulder/shoulder.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/shoulder/shoulder.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slap/slap.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slap/slap.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slapair/slapair.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slapair/slapair.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slapup/slapup.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slapup/slapup.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/tackle/tackle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/tackle/tackle.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/uppunch/uppunch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/uppunch/uppunch.bmp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,18 +92,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "MarcinGajkowski"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;MarcinGajkowski&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/MarcinGajkowski/PEP-VS-FOOT",
-    "accountId": "59a1f877-50df-494f-9ba4-2bc1115453e8"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/MarcinGajkowski/PEP-VS-FOOT&quot;,
+    &quot;accountId&quot;: &quot;59a1f877-50df-494f-9ba4-2bc1115453e8&quot;
   }
-}]]></component>
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/SDL_internal.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/dynapi/SDL_dynapi.h" root0="FORCE_HIGHLIGHTING" />
@@ -85,34 +124,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "CMake Application.mygame.executor": "Run",
-    "CMake Application.wyklad1_2.executor": "Run",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.advertisement.text.has.clang-format": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/gajko/Desktop/SGD/wyklad1-2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.LinkerScript",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;CMake Application.mygame.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.wyklad1_2.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/gajko/Desktop/SGD/wyklad1-2&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.LinkerScript&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="CMake Application.mygame">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="SDL2-static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="mygame" TARGET_NAME="SDL2-static" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -185,7 +219,9 @@
       <workItem from="1717312809300" duration="12137000" />
       <workItem from="1717409331728" duration="8493000" />
       <workItem from="1717429403200" duration="5684000" />
-      <workItem from="1717490357220" duration="9891000" />
+      <workItem from="1717490357220" duration="11982000" />
+      <workItem from="1717569304674" duration="6814000" />
+      <workItem from="1717670836875" duration="18397000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -195,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717535658275</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="remade the slapup gif">
+      <option name="closed" value="true" />
+      <created>1717545865757</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1717545865757</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -209,6 +253,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="cmake-build-debug stuff" />
     <MESSAGE value="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully" />
-    <option name="LAST_COMMIT_MESSAGE" value="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully" />
+    <MESSAGE value="remade the slapup gif" />
+    <option name="LAST_COMMIT_MESSAGE" value="remade the slapup gif" />
   </component>
 </project>
