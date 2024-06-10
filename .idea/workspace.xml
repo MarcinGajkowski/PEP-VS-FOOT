@@ -26,46 +26,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="remade the slapup gif">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_0.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_0.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_1.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_1.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_2.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_3.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Attack_3.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Backward.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Backward.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_BackwardDash.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_BackwardDash.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_CrouchGuard.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_CrouchGuard.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Damage.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Damage.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Dead.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Dead.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Forward.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Forward.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_ForwardDash.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_ForwardDash.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_StandGuard.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_StandGuard.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Win.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/F00_Win.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FOOTSIES Guy Sprites/Idle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/FOOTSIES Guy Sprites/Idle.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/backkick/backkick.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/backkick/backkick.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/fall2/fall2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/fall2/fall2.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/hurt/hurt.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/hurt/hurt.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/idle/idle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/idle/idle.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/jump/jump.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/jump/jump.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/jump2/jump2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/jump2/jump2.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/knock/knock.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/knock/knock.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/land/land.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/land/land.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/land2/land2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/land2/land2.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/machpunch/machpunch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/machpunch/machpunch.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/move/move.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/move/move.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza1/outofpizza1.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza1/outofpizza1.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza2/outofpizza2.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza2/outofpizza2.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza3/outofpizza3.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza3/outofpizza3.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza4/outofpizza4.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/outofpizza4/outofpizza4.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/shoulder/shoulder.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/shoulder/shoulder.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slap/slap.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slap/slap.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slapair/slapair.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slapair/slapair.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/slapup/slapup.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/slapup/slapup.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/tackle/tackle.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/tackle/tackle.bmp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/uppunch/uppunch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/uppunch/uppunch.bmp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -108,6 +70,9 @@
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/SDL_internal.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/dynapi/SDL_dynapi.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/render/SDL_sysrender.h" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
@@ -221,7 +186,11 @@
       <workItem from="1717429403200" duration="5684000" />
       <workItem from="1717490357220" duration="11982000" />
       <workItem from="1717569304674" duration="6814000" />
-      <workItem from="1717670836875" duration="18397000" />
+      <workItem from="1717670836875" duration="18742000" />
+      <workItem from="1717743106861" duration="1262000" />
+      <workItem from="1717852804539" duration="3633000" />
+      <workItem from="1717917619628" duration="1346000" />
+      <workItem from="1718015436716" duration="13103000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -239,7 +208,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717545865757</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method">
+      <option name="closed" value="true" />
+      <created>1717725096298</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1717725096298</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,6 +231,7 @@
     <MESSAGE value="cmake-build-debug stuff" />
     <MESSAGE value="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully" />
     <MESSAGE value="remade the slapup gif" />
-    <option name="LAST_COMMIT_MESSAGE" value="remade the slapup gif" />
+    <MESSAGE value="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method" />
   </component>
 </project>

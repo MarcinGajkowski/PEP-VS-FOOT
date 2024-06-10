@@ -71,111 +71,134 @@ std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::strin
     return {texture, [](SDL_Texture *t) { SDL_DestroyTexture(t); } };
 }
 
-class LAnimatedTexture
-{
+// class LAnimatedTexture
+// {
+// public:
+//     LAnimatedTexture();                     //Initializes variables
+//
+//     ~LAnimatedTexture();                    //Deallocates memory
+//
+//     std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::string &filename);   //Loads image at specified path
+//
+//     void free();                            //Deallocates texture
+//
+//     void render(SDL_Renderer *renderer, const std::string &filename, int width, int height,  int frames, int frameDelay);   //Renders texture at given point
+//
+//     int getWidth();                         //Gets image dimensions
+//     int getHeight();
+//
+//     SDL_Texture* getTexture();              // HOPEFULLY gets the hardware texture
+//
+// private:
+//     SDL_Texture* mTexture;                  //The actual hardware texture
+//
+//     int mWidth;                             //Image dimensions
+//     int mHeight;
+// };
+//
+// LAnimatedTexture::LAnimatedTexture()
+// {
+//     mTexture = nullptr;
+//     mWidth = 0;
+//     mHeight = 0;
+// }
+//
+// LAnimatedTexture::~LAnimatedTexture()
+// {
+//     free();
+// }
+
+// void LAnimatedTexture::free()
+// {
+//     if( mTexture != nullptr )              // Free texture if it exists
+//     {
+//         SDL_DestroyTexture( mTexture );
+//         mTexture = nullptr;
+//         mWidth = 0;
+//         mHeight = 0;
+//     }
+// }
+
+class Move {
 public:
-    LAnimatedTexture();                     //Initializes variables
-
-    ~LAnimatedTexture();                    //Deallocates memory
-
-    std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::string &filename);   //Loads image at specified path
-
-    void free();                            //Deallocates texture
-
-    void render(SDL_Renderer *renderer, const std::string &filename, int width, int height,  int frames, int frameDelay);   //Renders texture at given point
-
-    int getWidth();                         //Gets image dimensions
-    int getHeight();
-
-    SDL_Texture* getTexture();               // HOPEFULLY gets the hardware texture
-
+    std::shared_ptr<SDL_Texture> load_anim(SDL_Renderer *renderer, const std::string &filename, int width, int height,
+                                                  int frames);
+    SDL_Rect *getSpecificFrame(Uint32 frame);
+    [[nodiscard]] Uint32 getFrameCount() const;
+    Move() = default;
+    Move(const int hit, const int block, const int hitstun) {
+        damage_on_hit = hit;
+        damage_on_block = block;
+        hitstun_frames = hitstun;
+    }
 private:
-    SDL_Texture* mTexture;                  //The actual hardware texture
-
-    int mWidth;                             //Image dimensions
-    int mHeight;
+    SDL_Texture* sprite_sheet = {};
+    Uint32 frame_count = 0;
+    int damage_on_hit = 0;
+    int damage_on_block = 0;
+    SDL_Rect hitbox = {};
+    int hitstun_frames = 0;
+    SDL_Rect frame_list[];
 };
 
-LAnimatedTexture::LAnimatedTexture()
-{
-    mTexture = nullptr;
-    mWidth = 0;
-    mHeight = 0;
-}
-
-LAnimatedTexture::~LAnimatedTexture()
-{
-    free();
-}
-
-std::shared_ptr<SDL_Texture> LAnimatedTexture::load_image(SDL_Renderer *renderer, const std::string &filename) {
+std::shared_ptr<SDL_Texture> Move::load_anim(SDL_Renderer *renderer, const std::string &filename, int width, int height,
+                                            int frames) {
     SDL_Surface *surface = SDL_LoadBMP(filename.c_str());
     if (!surface) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create surface from image: %s", SDL_GetError());
         throw std::invalid_argument(SDL_GetError());
     }
-    SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 255, 255)); // dać cyan bg na transparentny chyba
+    SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 255, 255)); // turns cyan transparent
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!texture) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture from surface: %s", SDL_GetError());
         throw std::invalid_argument(SDL_GetError());
     }
-    else {
-        mWidth = surface->w;
-        mHeight = surface->h;
+    sprite_sheet = texture;
+    frame_count = frames;
+    // SDL_Rect renderQuad = { 0, 0, sprite_sheet->w, sprite_sheet->h };
+
+    for (int i = 0; i < texture->h/height; i++) {
+        for (int j = 0; j < texture->w/width; j++) {
+            if (i*(texture->w/width) + j == frames) break;
+            // put frame from sprite sheet onto the frame list
+            frame_list[i*(texture->w/width) + j] = { j*width, i*height, width, height };
+        }
     }
+
+    // renderQuad.x = frame_list[ idx ].x;
+    // renderQuad.y = frame_list[ idx ].y;
+    // renderQuad.w = frame_list[ idx ].w;
+    // renderQuad.h = frame_list[ idx ].h;
+
+    // SDL_RenderPresent(renderer);
+    // ++currentFrame;
+    // if (currentFrame/frameDelay >= frames) {
+    //     currentFrame = 0;
+    // }
     SDL_FreeSurface(surface);
-    mTexture = texture;
     return {texture, [](SDL_Texture *t) { SDL_DestroyTexture(t); } };
 }
 
-void LAnimatedTexture::free()
-{
-    if( mTexture != nullptr )              // Free texture if it exists
-    {
-        SDL_DestroyTexture( mTexture );
-        mTexture = nullptr;
-        mWidth = 0;
-        mHeight = 0;
-    }
+SDL_Rect * Move::getSpecificFrame(Uint32 frame) {
+    return &frame_list[frame];
 }
 
-void LAnimatedTexture::render(SDL_Renderer *renderer, const std::string &filename, int width, int height,  int frames, int frameDelay) {
-    load_image(renderer, filename);
-    SDL_Rect frame_list[frames - 1];
-    SDL_Rect renderQuad = { 0, 0, mWidth, mHeight };
-
-    for (int i = 0; i < mHeight/height; i++) {
-        for (int j = 0; j < mWidth/width; j++) {
-            if (i*(mWidth/width) + j == frames) break;
-            SDL_Rect anim_frame = { j*width, i*height, width, height };   // Set rendering space and render to screen
-            frame_list[i*(mWidth/width) + j] = anim_frame;
-        }
-    }
-    int currentFrame = 0;
-    renderQuad.x = frame_list[ currentFrame/frameDelay ].x;
-    renderQuad.y = frame_list[ currentFrame/frameDelay ].y;
-    renderQuad.w = frame_list[ currentFrame/frameDelay ].w;
-    renderQuad.h = frame_list[ currentFrame/frameDelay ].h;
-    SDL_RenderCopy(renderer, mTexture, &frame_list[ currentFrame/frameDelay ], &renderQuad);
-    // SDL_RenderPresent(renderer);
-    ++currentFrame;
-    if (currentFrame/frameDelay >= frames) {
-        currentFrame = 0;
-    }
+Uint32 Move::getFrameCount() const {
+    return frame_count;
 }
 
-int LAnimatedTexture::getWidth() {                                // ??? we'll see
-    return mWidth;
-}
-
-int LAnimatedTexture::getHeight() {
-    return mHeight;
-}
-
-SDL_Texture* LAnimatedTexture::getTexture() {
-    return mTexture;
-}
+// int LAnimatedTexture::getWidth() {                                // ??? we'll see
+//     return mWidth;
+// }
+//
+// int LAnimatedTexture::getHeight() {
+//     return mHeight;
+// }
+//
+// SDL_Texture* LAnimatedTexture::getTexture() {
+//     return mTexture;
+// }
 
 union vect_t {                                     // można użyć jako albo [x,y] albo tablicę 2-wymiarową
     struct { double x; double y;} v;
@@ -201,26 +224,34 @@ struct player_t {
     vect_t v; // velocity
     vect_t a; // acceleration
     // int num;
-    enum character { PEPPINO, FOOTSIES };
-    LAnimatedTexture idle{};
-    LAnimatedTexture walk{};
-    LAnimatedTexture jump{};
-    LAnimatedTexture forward_jump{};
-    LAnimatedTexture attackL{};
-    LAnimatedTexture attackM{};
-    LAnimatedTexture attackH{};
-    LAnimatedTexture attackS{};
-    LAnimatedTexture air_attackL{};
-    LAnimatedTexture air_attackM{};
-    LAnimatedTexture air_attackH{};
-    LAnimatedTexture air_attackS{};
-    LAnimatedTexture block{};
-    LAnimatedTexture block_low{};
-    LAnimatedTexture hurt{};
-    LAnimatedTexture dead{};
+    // enum character { PEPPINO, FOOTSIES };
+    Move idle{};
+    // Move walk{};
+    // Move jump{};
+    // Move forward_jump{};
+    // Move attackL{};
+    // Move attackM{};
+    // Move attackH{};
+    // Move attackS{};
+    // Move air_attackL{};
+    // Move air_attackM{};
+    // Move air_attackH{};
+    // Move air_attackS{};
+    // Move block{};
+    // Move block_low{};
+    // Move hurt{};
+    // Move dead{};
+
 };
 
+struct player_t* createPlayer(struct player_t *pl, vect_t p, vect_t v, vect_t a) {
+    pl = static_cast<player_t *>(malloc(sizeof(*pl) + sizeof(Move) * 16) + sizeof(double) * 6);
 
+    pl->p = p;
+    pl->v = v;
+    pl->a = a;
+    return pl;
+}
 
 
 bool is_colliding(vect_t position, const game_map_t &map) {
@@ -349,18 +380,18 @@ int main(int argc, char *argv[])
     using namespace std::chrono_literals;
     using namespace std::chrono;
     using namespace std;
-    SDL_Window *window;
-    char str[7] = {'h','e','l','l','o','!','\0'};
-    SDL_Renderer *renderer;
+    SDL_Window *window = nullptr;
+    SDL_Renderer *renderer = nullptr;
 
     double dt = 1./60.;
+    const Uint32 anim_speed = SDL_GetTicks() / 1000;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
         return 3;
     }
 
-    if (SDL_CreateWindow(str,  SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+    if (char str = 'B'; SDL_CreateWindow(&str,  SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
         return 3;
     }
@@ -385,7 +416,7 @@ int main(int argc, char *argv[])
 
     bool still_playing = true;
     player_t player;
-    player.PEPPINO;
+    // player.PEPPINO;
 
     player.p.v.x = 1;
     player.p.v.y = 8;
@@ -395,7 +426,7 @@ int main(int argc, char *argv[])
     player.v.v.y = 0;
 
     player_t player2;
-    player2.FOOTSIES;
+    // player2.FOOTSIES;
 
     player2.p.v.x = 24;
     player2.p.v.y = 8;
@@ -438,6 +469,7 @@ int main(int argc, char *argv[])
                     break;
                 }
                 case SDL_KEYUP: {
+
                     if (event.key.keysym.scancode == SDL_SCANCODE_O) still_playing = false;
                     if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.a.v.y = 0;
                     // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.a.v.y = 0;
@@ -482,7 +514,7 @@ int main(int argc, char *argv[])
 
         SDL_Rect player_rect = {(int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player.p.v.y*TILE_SIZE-TILE_SIZE+29), 100, 100};
         {
-            int r, g, b = 0;
+            int r = 0, g = 0, b = 0;
             if (is_grounded(player, game_map)) {
                 r = 255;
             }
@@ -493,7 +525,7 @@ int main(int argc, char *argv[])
         }
         SDL_Rect player2_rect = {(int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE+29), 60, 50};
         {
-            int r, g, b = 0;
+            int r = 0, g = 0, b = 0;
             if (is_grounded(player2, game_map)) {
                 r = 255;
             }
@@ -504,10 +536,16 @@ int main(int argc, char *argv[])
         }
         // SDL_RenderDrawRect(renderer, &player_rect);
         // SDL_RenderDrawRect(renderer, &player2_rect);
-        SDL_RenderCopyEx(renderer, player.idle.getTexture(), NULL, &player_rect, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(renderer, player2.idle.getTexture(), NULL, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
-        player.idle.render(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100,  17, 5);
-        player2.idle.render(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50,  5, 10);
+        auto player_idle = player.idle.load_anim(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100,  17);
+        auto player2_idle = player2.idle.load_anim(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50,  5);
+        SDL_RenderCopyEx(renderer, player_idle.get(),
+                         player.idle.getSpecificFrame(anim_speed % player.idle.getFrameCount()), &player_rect,
+                         0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, player2_idle.get(),
+                         player2.idle.getSpecificFrame(anim_speed % player.idle.getFrameCount()), &player2_rect,
+                         0, NULL, SDL_FLIP_HORIZONTAL);
+
+
         // SDL_RenderDrawLine(renderer, 0, 0, x, y);                // linia podążająca za playerem
         // SDL_SetRenderDrawColor(renderer, 0x00, 0xff, 0x00, 0xff);
         // SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP);
