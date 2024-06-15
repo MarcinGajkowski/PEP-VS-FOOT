@@ -121,48 +121,56 @@ std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::strin
 
 class Move {
 public:
-    std::shared_ptr<SDL_Texture> load_anim(SDL_Renderer *renderer, const std::string &filename, int width, int height,
+    std::shared_ptr<SDL_Texture> load_sheet(SDL_Renderer *renderer, const std::string &filename, int width, int height,
                                                   int frames);
-    SDL_Rect *getSpecificFrame(Uint32 frame);
-    [[nodiscard]] Uint32 getFrameCount() const;
-    Move() = default;
-    Move(const int hit, const int block, const int hitstun) {
-        damage_on_hit = hit;
-        damage_on_block = block;
-        hitstun_frames = hitstun;
-    }
+    SDL_Rect getSpecificFrame(int frame);
+    int getFrameCount() const;
+    SDL_Rect getHitbox();
+    void setHitbox(int x, int y, int w, int h);
+    // Move() = default;
+    // Move(Move* m, const int hit, const int block, const int hitstun, SDL_Rect frames[]) {
+    //     damage_on_hit = hit;
+    //     damage_on_block = block;
+    //     hitstun_frames = hitstun;
+    //     m = malloc(sizeof(*Move) + sizeof(SDL_Rect) * );
+    //
+    // }
 private:
     SDL_Texture* sprite_sheet = {};
-    Uint32 frame_count = 0;
+    int frame_count = 0;
     int damage_on_hit = 0;
     int damage_on_block = 0;
-    SDL_Rect hitbox = {};
     int hitstun_frames = 0;
-    SDL_Rect frame_list[];
+    SDL_Rect hitbox = {};
+    std::vector<SDL_Rect> frame_list;
 };
 
-std::shared_ptr<SDL_Texture> Move::load_anim(SDL_Renderer *renderer, const std::string &filename, int width, int height,
+std::shared_ptr<SDL_Texture> Move::load_sheet(SDL_Renderer *renderer, const std::string &filename, int width, int height,
                                             int frames) {
     SDL_Surface *surface = SDL_LoadBMP(filename.c_str());
     if (!surface) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create surface from image: %s", SDL_GetError(), NULL);
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create surface from image: %s", SDL_GetError());
         throw std::invalid_argument(SDL_GetError());
     }
     SDL_SetColorKey(surface, SDL_TRUE, SDL_MapRGB(surface->format, 0, 255, 255)); // turns cyan transparent
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (!texture) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create texture from surface: %s", SDL_GetError(), NULL);
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create texture from surface: %s", SDL_GetError());
         throw std::invalid_argument(SDL_GetError());
     }
     sprite_sheet = texture;
     frame_count = frames;
+    // frame_list.resize(frames);
     // SDL_Rect renderQuad = { 0, 0, sprite_sheet->w, sprite_sheet->h };
 
     for (int i = 0; i < texture->h/height; i++) {
         for (int j = 0; j < texture->w/width; j++) {
             if (i*(texture->w/width) + j == frames) break;
-            // put frame from sprite sheet onto the frame list
-            frame_list[i*(texture->w/width) + j] = { j*width, i*height, width, height };
+            SDL_Rect frame = { j*width, i*height, width, height };
+            // frame_list.insert(frame_list.at(i*(texture->w/width) + j), frame);
+            frame_list.push_back(frame);            // put frame from sprite sheet onto the frame list
         }
     }
 
@@ -180,12 +188,23 @@ std::shared_ptr<SDL_Texture> Move::load_anim(SDL_Renderer *renderer, const std::
     return {texture, [](SDL_Texture *t) { SDL_DestroyTexture(t); } };
 }
 
-SDL_Rect * Move::getSpecificFrame(Uint32 frame) {
-    return &frame_list[frame];
+SDL_Rect Move::getSpecificFrame(int frame) {
+    return frame_list.at(frame);
 }
 
-Uint32 Move::getFrameCount() const {
+int Move::getFrameCount() const {
     return frame_count;
+}
+
+SDL_Rect Move::getHitbox() {
+    return hitbox;
+}
+
+void Move::setHitbox(int x, int y, int w, int h) {
+    hitbox.x = x;
+    hitbox.y = y;
+    hitbox.w = w;
+    hitbox.h = h;
 }
 
 // int LAnimatedTexture::getWidth() {                                // ??? we'll see
@@ -223,6 +242,7 @@ struct player_t {
     vect_t p; // position
     vect_t v; // velocity
     vect_t a; // acceleration
+    int health = 100;
     // int num;
     // enum character { PEPPINO, FOOTSIES };
     Move idle{};
@@ -244,14 +264,14 @@ struct player_t {
 
 };
 
-struct player_t* createPlayer(struct player_t *pl, vect_t p, vect_t v, vect_t a) {
-    pl = static_cast<player_t *>(malloc(sizeof(*pl) + sizeof(Move) * 16) + sizeof(double) * 6);
-
-    pl->p = p;
-    pl->v = v;
-    pl->a = a;
-    return pl;
-}
+// struct player_t* createPlayer(struct player_t *pl, vect_t p, vect_t v, vect_t a) {
+//     pl = static_cast<player_t *>(malloc(sizeof(*pl) + sizeof(Move) * 16) + sizeof(double) * 6);
+//
+//     pl->p = p;
+//     pl->v = v;
+//     pl->a = a;
+//     return pl;
+// }
 
 
 bool is_colliding(vect_t position, const game_map_t &map) {
@@ -380,31 +400,37 @@ int main(int argc, char *argv[])
     using namespace std::chrono_literals;
     using namespace std::chrono;
     using namespace std;
-    SDL_Window *window = nullptr;
-    SDL_Renderer *renderer = nullptr;
+    SDL_Window *window = SDL_CreateWindow("PEP VS. FOOT",  SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED, 1280, 720,
+                                            SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     double dt = 1./60.;
-    const Uint32 anim_speed = SDL_GetTicks() / 1000;
+    // Uint32 ticks = SDL_GetTicks();
+    // const Uint32 anim_speed = ticks / 100;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL: %s", SDL_GetError(), NULL);
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
         return 3;
     }
 
-    if (char str = 'B'; SDL_CreateWindow(&str,  SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_FULLSCREEN_DESKTOP)) {
+    /*if (SDL_CreateWindowAndRenderer(1280, 720, SDL_WINDOW_RESIZABLE, &window, &renderer) < 0) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create window and renderer: %s", SDL_GetError(), NULL);
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
+        return 3;
+    }*/
+
+    if (!window) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create window: %s", SDL_GetError(), NULL);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
         return 3;
     }
 
-    if (SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) {
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
+    if (!renderer) {
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create renderer: %s", SDL_GetError(), NULL);
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create renderer: %s", SDL_GetError());
         return 3;
     }
-
-    // if (SDL_CreateWindowAndRenderer(1280, 720, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
-    //     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
-    //     return 3;
-    // }
 
     // auto player_texture = load_image(renderer, "player.bmp");
     // auto clouds_texture = load_image(renderer, "clouds.bmp");
@@ -418,8 +444,8 @@ int main(int argc, char *argv[])
     player_t player;
     // player.PEPPINO;
 
-    player.p.v.x = 1;
-    player.p.v.y = 8;
+    player.p.v.x = 2;
+    player.p.v.y = 4;
     player.a.v.x = 0;
     player.a.v.y = 0;
     player.v.v.x = 0;
@@ -429,11 +455,14 @@ int main(int argc, char *argv[])
     // player2.FOOTSIES;
 
     player2.p.v.x = 24;
-    player2.p.v.y = 8;
+    player2.p.v.y = 4;
     player2.a.v.x = 0;
     player2.a.v.y = 0;
     player2.v.v.x = 0;
     player2.v.v.y = 0;
+
+    auto player_idle = player.idle.load_sheet(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100,  17);
+    auto player2_idle = player2.idle.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50,  5);
 
     // int x = 100;
     // int y = 100;
@@ -450,16 +479,16 @@ int main(int argc, char *argv[])
                 }
                 case SDL_KEYDOWN: {
                     if (is_grounded(player, game_map)) {
-                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.a.v.y = -2000;
-                        // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.a.v.y = 50;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player.a.v.x = -30;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player.a.v.x = 30;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_W) player.a.v.y = -2000;
+                        // if (event.key.keysym.scancode == SDL_SCANCODE_S) player.a.v.y = 50;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_A) player.a.v.x = -30;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_D) player.a.v.x = 30;
                     }
                     if (is_grounded(player2, game_map)) {
-                        if (event.key.keysym.scancode == SDL_SCANCODE_W) player2.a.v.y = -2000;
-                        // if (event.key.keysym.scancode == SDL_SCANCODE_S) player2.a.v.y = 50;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_A) player2.a.v.x = -30;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_D) player2.a.v.x = 30;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) player2.a.v.y = -2000;
+                        // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player2.a.v.y = 50;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player2.a.v.x = -30;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player2.a.v.x = 30;
                     }
                     // if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.v.v.y = -50;
                     // // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.v.v.y = 50;
@@ -471,15 +500,18 @@ int main(int argc, char *argv[])
                 case SDL_KEYUP: {
 
                     if (event.key.keysym.scancode == SDL_SCANCODE_O) still_playing = false;
-                    if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.a.v.y = 0;
-                    // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.a.v.y = 0;
-                    if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player.a.v.x = 0;
-                    if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player.a.v.x = 0;
 
-                    if (event.key.keysym.scancode == SDL_SCANCODE_W) player2.a.v.y = 0;
-                    // if (event.key.keysym.scancode == SDL_SCANCODE_S) player2.a.v.y = 0;
-                    if (event.key.keysym.scancode == SDL_SCANCODE_A) player2.a.v.x = 0;
-                    if (event.key.keysym.scancode == SDL_SCANCODE_D) player2.a.v.x = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_W) player.a.v.y = 0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_S) player.a.v.y = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_A) player.a.v.x = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_D) player.a.v.x = 0;
+
+                    if (event.key.keysym.scancode == SDL_SCANCODE_UP) player2.a.v.y = 0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player2.a.v.y = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player2.a.v.x = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player2.a.v.x = 0;
+
+
 
                     // if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.v.v.y = -0;
                     // // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.v.v.y = 0;
@@ -512,7 +544,7 @@ int main(int argc, char *argv[])
 
         draw_map(renderer, game_map, tiles_texture);
 
-        SDL_Rect player_rect = {(int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player.p.v.y*TILE_SIZE-TILE_SIZE+29), 100, 100};
+        SDL_Rect player_rect = {(int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259), 400, 400};
         {
             int r = 0, g = 0, b = 0;
             if (is_grounded(player, game_map)) {
@@ -523,7 +555,7 @@ int main(int argc, char *argv[])
             }
             SDL_SetRenderDrawColor(renderer, r,g,b, 0xFF);
         }
-        SDL_Rect player2_rect = {(int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE+29), 60, 50};
+        SDL_Rect player2_rect = {(int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2)), (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375), 600, 500};
         {
             int r = 0, g = 0, b = 0;
             if (is_grounded(player2, game_map)) {
@@ -534,17 +566,12 @@ int main(int argc, char *argv[])
             }
             SDL_SetRenderDrawColor(renderer, r,g,b, 0xFF);
         }
-        // SDL_RenderDrawRect(renderer, &player_rect);
-        // SDL_RenderDrawRect(renderer, &player2_rect);
-        auto player_idle = player.idle.load_anim(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100,  17);
-        auto player2_idle = player2.idle.load_anim(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50,  5);
-        SDL_RenderCopyEx(renderer, player_idle.get(),
-                         player.idle.getSpecificFrame(anim_speed % player.idle.getFrameCount()), &player_rect,
-                         0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(renderer, player2_idle.get(),
-                         player2.idle.getSpecificFrame(anim_speed % player.idle.getFrameCount()), &player2_rect,
-                         0, NULL, SDL_FLIP_HORIZONTAL);
-
+        SDL_RenderDrawRect(renderer, &player_rect);
+        SDL_RenderDrawRect(renderer, &player2_rect);
+        auto player_sprite = player.idle.getSpecificFrame((int)game_time % player.idle.getFrameCount());
+        auto player2_sprite = player2.idle.getSpecificFrame((int)game_time % player2.idle.getFrameCount());
+        SDL_RenderCopyEx(renderer, player_idle.get(), &player_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, player2_idle.get(), &player2_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
 
         // SDL_RenderDrawLine(renderer, 0, 0, x, y);                // linia podążająca za playerem
         // SDL_SetRenderDrawColor(renderer, 0x00, 0xff, 0x00, 0xff);

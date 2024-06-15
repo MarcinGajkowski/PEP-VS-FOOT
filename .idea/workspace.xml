@@ -22,11 +22,11 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=C:\Users\gajko\.vcpkg-clion\vcpkg\scripts\buildsystems\vcpkg.cmake" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=C:\Users\gajko\.vcpkg-clion\vcpkg\scripts\buildsystems\vcpkg.cmake -DSDL2IMAGE_BACKEND_STB:BOOL=OFF -DSDL2IMAGE_BMP:BOOL=ON -DSDL2IMAGE_DEPS_SHARED:BOOL=OFF -DSDL2IMAGE_GIF:BOOL=OFF -DSDL2IMAGE_JPG:BOOL=OFF -DSDL2IMAGE_JPG_SAVE:BOOL=OFF -DSDL2IMAGE_LBM:BOOL=OFF -DSDL2IMAGE_PCX:BOOL=OFF -DSDL2IMAGE_PNG:BOOL=OFF -DSDL2IMAGE_PNG_SAVE:BOOL=OFF -DSDL2IMAGE_PNM:BOOL=OFF -DSDL2IMAGE_QOI:BOOL=OFF -DSDL2IMAGE_SVG:BOOL=OFF -DSDL2IMAGE_TGA:BOOL=OFF -DSDL2IMAGE_XCF:BOOL=OFF -DSDL2IMAGE_XPM:BOOL=ON -DSDL2IMAGE_XV:BOOL=OFF" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="made a cleaner function/method for animating, still gotta figure out how to initialize or malloc for all these arrays">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
@@ -107,7 +107,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.LinkerScript&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CMakeSettings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -147,11 +147,6 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="wyklad1_2" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="mygame" TARGET_NAME="mygame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="mygame" RUN_TARGET_NAME="mygame">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="CMake Application.SDL2-static" />
       <item itemvalue="CMake Application.SDL2" />
@@ -160,7 +155,6 @@
       <item itemvalue="CMake Application.mygame" />
       <item itemvalue="CMake Application.sdl_headers_copy" />
       <item itemvalue="CMake Application.uninstall" />
-      <item itemvalue="CMake Application.wyklad1_2" />
     </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -190,7 +184,13 @@
       <workItem from="1717743106861" duration="1262000" />
       <workItem from="1717852804539" duration="3633000" />
       <workItem from="1717917619628" duration="1346000" />
-      <workItem from="1718015436716" duration="13103000" />
+      <workItem from="1718015436716" duration="15624000" />
+      <workItem from="1718088380052" duration="8803000" />
+      <workItem from="1718180182363" duration="9002000" />
+      <workItem from="1718234532551" duration="2098000" />
+      <workItem from="1718276605288" duration="4584000" />
+      <workItem from="1718357844365" duration="4019000" />
+      <workItem from="1718435723566" duration="21087000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -216,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717725096298</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="made a cleaner function/method for animating, still gotta figure out how to initialize or malloc for all these arrays">
+      <option name="closed" value="true" />
+      <created>1718051970001</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1718051970001</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -227,11 +235,23 @@
     <isAutomaticFoundErrors value="true" />
     <isAutomaticReloadCMake value="true" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="cmake-build-debug stuff" />
     <MESSAGE value="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully" />
     <MESSAGE value="remade the slapup gif" />
     <MESSAGE value="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method" />
+    <MESSAGE value="made a cleaner function/method for animating, still gotta figure out how to initialize or malloc for all these arrays" />
+    <option name="LAST_COMMIT_MESSAGE" value="made a cleaner function/method for animating, still gotta figure out how to initialize or malloc for all these arrays" />
   </component>
 </project>
