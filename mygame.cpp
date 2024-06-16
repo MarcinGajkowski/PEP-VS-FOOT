@@ -122,7 +122,7 @@ std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::strin
 class Move {
 public:
     std::shared_ptr<SDL_Texture> load_sheet(SDL_Renderer *renderer, const std::string &filename, int width, int height,
-                                                  int frames);
+                                              int hurtboxW, int hurtboxH, int frames);
     SDL_Rect getSpecificFrame(int frame);
     int getFrameCount() const;
     SDL_Rect getHitbox();
@@ -146,7 +146,7 @@ private:
 };
 
 std::shared_ptr<SDL_Texture> Move::load_sheet(SDL_Renderer *renderer, const std::string &filename, int width, int height,
-                                            int frames) {
+                                            int hurtboxW, int hurtboxH, int frames) {
     SDL_Surface *surface = SDL_LoadBMP(filename.c_str());
     if (!surface) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create surface from image: %s", SDL_GetError(), NULL);
@@ -168,7 +168,7 @@ std::shared_ptr<SDL_Texture> Move::load_sheet(SDL_Renderer *renderer, const std:
     for (int i = 0; i < texture->h/height; i++) {
         for (int j = 0; j < texture->w/width; j++) {
             if (i*(texture->w/width) + j == frames) break;
-            SDL_Rect frame = { j*width, i*height, width, height };
+            SDL_Rect frame = { j*width, i*height, hurtboxW, hurtboxH };
             // frame_list.insert(frame_list.at(i*(texture->w/width) + j), frame);
             frame_list.push_back(frame);            // put frame from sprite sheet onto the frame list
         }
@@ -245,10 +245,13 @@ struct player_t {
     int health = 100;
     // int num;
     // enum character { PEPPINO, FOOTSIES };
+    double time_since_last_input;
     Move idle{};
-    // Move walk{};
-    // Move jump{};
-    // Move forward_jump{};
+    Move forward_walk{};
+    Move back_walk{};
+    Move jump{};
+    Move forward_jump{};
+    Move crouch{};
     // Move attackL{};
     // Move attackM{};
     // Move attackH{};
@@ -374,8 +377,8 @@ player_t update_player(player_t player_old, const game_map_t &map, double dt) {
         player.p.v.x = 0;
         player.v.v.x = 0;
     }
-    if (player.p.v.x > 30) {
-        player.p.v.x = 30;
+    if (player.p.v.x > 25) {
+        player.p.v.x = 25;
         player.v.v.x = 0;
     }
     return player;
@@ -437,14 +440,11 @@ int main(int argc, char *argv[])
     auto tiles_texture = load_image(renderer, "tiles.bmp");
     auto bg_texture = load_image(renderer, "background.bmp");
 
-    // auto player_texture = load_image(renderer, "PEPPINO Sprites/crouch/crouch.bmp");
-    // auto player2_texture = load_image(renderer, "FOOTSIES Guy Sprites/Idle_0.bmp");
-
     bool still_playing = true;
     player_t player;
     // player.PEPPINO;
 
-    player.p.v.x = 2;
+    player.p.v.x = 0;
     player.p.v.y = 4;
     player.a.v.x = 0;
     player.a.v.y = 0;
@@ -454,18 +454,28 @@ int main(int argc, char *argv[])
     player_t player2;
     // player2.FOOTSIES;
 
-    player2.p.v.x = 24;
+    player2.p.v.x = 23;
     player2.p.v.y = 4;
     player2.a.v.x = 0;
     player2.a.v.y = 0;
     player2.v.v.x = 0;
     player2.v.v.y = 0;
 
-    auto player_idle = player.idle.load_sheet(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100,  17);
-    auto player2_idle = player2.idle.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50,  5);
+    auto player_idle = player.idle.load_sheet(renderer, "PEPPINO Sprites/idle/idle.bmp", 100, 100, 75, 100, 17);
+    auto player_fwalk = player.forward_walk.load_sheet(renderer, "PEPPINO Sprites/move/move.bmp", 100, 100, 75, 100, 12);
+    auto player_bwalk = player.back_walk.load_sheet(renderer, "PEPPINO Sprites/move/move.bmp", 100, 100, 75, 100, 12);
+    auto player_crouch = player.crouch.load_sheet(renderer, "PEPPINO Sprites/crouch/crouch.bmp", 100, 100, 85, 100, 2);
+    // auto player_crouch_start = load_image(renderer, "PEPPINO Sprites/crouch/couchstart.bmp");
+    auto player_jump = player.jump.load_sheet(renderer, "PEPPINO Sprites/jump/jump.bmp", 100, 100, 75, 100, 12);
+    auto player_fjump = player.forward_jump.load_sheet(renderer, "PEPPINO Sprites/jump2/jump2.bmp", 100, 100, 75, 100, 12);
 
-    // int x = 100;
-    // int y = 100;
+    auto player2_idle = player2.idle.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5);
+    auto player2_fwalk = player2.forward_walk.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Forward.bmp", 60, 50, 48, 50, 6);
+    auto player2_bwalk = player2.back_walk.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Backward.bmp", 60, 50, 48, 50, 6);
+    auto player2_crouch = player2.crouch.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_CrouchGuard.bmp", 60, 50, 48, 50, 2);
+    // auto player2_jump = player2.jump.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5);
+    // auto player2_fjump = player2.forward_jump.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5);
+
     double game_time = 0.;
     steady_clock::time_point current_time = steady_clock::now();
     while (still_playing) {
@@ -479,16 +489,54 @@ int main(int argc, char *argv[])
                 }
                 case SDL_KEYDOWN: {
                     if (is_grounded(player, game_map)) {
-                        if (event.key.keysym.scancode == SDL_SCANCODE_W) player.a.v.y = -2000;
-                        // if (event.key.keysym.scancode == SDL_SCANCODE_S) player.a.v.y = 50;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_A) player.a.v.x = -30;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_D) player.a.v.x = 30;
+                        //player.time_since_last_input = 0;
+                        //player.time_since_last_input += dt;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_W) {
+                            player.a.v.y = -3200;
+                            //auto player_jump_sprite = player.jump.getSpecificFrame((int)player.time_since_last_input % player.jump.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player_jump.get(), &player_jump_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_S) {
+                            player.a.v.x = 0;
+                            //auto player_crouch_sprite = player.crouch.getSpecificFrame((int)player.time_since_last_input % player.crouch.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player_crouch.get(), &player_crouch_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_A) {
+                            player.a.v.x = -40;
+                            //auto player_bwalk_sprite = player.back_walk.getSpecificFrame((int)player.time_since_last_input % player.back_walk.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player_bwalk.get(), &player_bwalk_sprite, &player_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_D) {
+                            player.a.v.x = 50;
+                            //auto player_fwalk_sprite = player.forward_walk.getSpecificFrame((int)player.time_since_last_input % player.forward_walk.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player_fwalk.get(), &player_fwalk_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
                     }
                     if (is_grounded(player2, game_map)) {
-                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) player2.a.v.y = -2000;
-                        // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player2.a.v.y = 50;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player2.a.v.x = -30;
-                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player2.a.v.x = 30;
+                        player2.time_since_last_input = 0;
+                        player2.time_since_last_input += dt;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+                            player2.a.v.y = -2500;
+                            //auto player2_jump_sprite = player2.jump.getSpecificFrame((int)game_time % player2.jump.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player2_jump.get(), &player2_jump_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+                            player2.a.v.x = 0;
+                            //auto player2_crouch_sprite1 = player2.crouch.getSpecificFrame(0);
+                            //auto player2_crouch_sprite2 = player2.crouch.getSpecificFrame(1);
+                            //SDL_RenderCopyEx(renderer, player2_crouch.get(), &player2_crouch_sprite1, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                            //SDL_RenderCopyEx(renderer, player2_crouch.get(), &player2_crouch_sprite2, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+                            player2.a.v.x = -35;
+                            //auto player2_fwalk_sprite = player2.forward_walk.getSpecificFrame((int)player2.time_since_last_input % player2.forward_walk.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player2_fwalk.get(), &player2_fwalk_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+                            player2.a.v.x = 30;
+                            //auto player2_bwalk_sprite = player2.back_walk.getSpecificFrame((int)player2.time_since_last_input % player2.back_walk.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player2_bwalk.get(), &player2_bwalk_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
                     }
                     // if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.v.v.y = -50;
                     // // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.v.v.y = 50;
@@ -498,7 +546,6 @@ int main(int argc, char *argv[])
                     break;
                 }
                 case SDL_KEYUP: {
-
                     if (event.key.keysym.scancode == SDL_SCANCODE_O) still_playing = false;
 
                     if (event.key.keysym.scancode == SDL_SCANCODE_W) player.a.v.y = 0;
@@ -510,8 +557,6 @@ int main(int argc, char *argv[])
                     // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player2.a.v.y = 0;
                     if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player2.a.v.x = 0;
                     if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player2.a.v.x = 0;
-
-
 
                     // if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.v.v.y = -0;
                     // // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.v.v.y = 0;
@@ -568,10 +613,94 @@ int main(int argc, char *argv[])
         }
         SDL_RenderDrawRect(renderer, &player_rect);
         SDL_RenderDrawRect(renderer, &player2_rect);
-        auto player_sprite = player.idle.getSpecificFrame((int)game_time % player.idle.getFrameCount());
-        auto player2_sprite = player2.idle.getSpecificFrame((int)game_time % player2.idle.getFrameCount());
-        SDL_RenderCopyEx(renderer, player_idle.get(), &player_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
-        SDL_RenderCopyEx(renderer, player2_idle.get(), &player2_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+        auto player_idle_sprite = player.idle.getSpecificFrame((int)game_time % player.idle.getFrameCount());
+        SDL_RenderCopyEx(renderer, player_idle.get(), &player_idle_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+        auto player2_idle_sprite = player2.idle.getSpecificFrame((int)game_time % player2.idle.getFrameCount());
+        SDL_RenderCopyEx(renderer, player2_idle.get(), &player2_idle_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+
+        while(SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT: {
+                    still_playing = false;
+                    break;
+                }
+                case SDL_KEYDOWN: {
+                    if (is_grounded(player, game_map)) {
+                        player.time_since_last_input = 0;
+                        player.time_since_last_input += dt;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_W) {
+                            auto player_jump_sprite = player.jump.getSpecificFrame((int)player.time_since_last_input % player.jump.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player_jump.get(), &player_jump_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_S) {
+                            auto player_crouch_sprite = player.crouch.getSpecificFrame((int)player.time_since_last_input % player.crouch.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player_crouch.get(), &player_crouch_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_A) {
+                            auto player_bwalk_sprite = player.back_walk.getSpecificFrame((int)player.time_since_last_input % player.back_walk.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player_bwalk.get(), &player_bwalk_sprite, &player_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_D) {
+                            auto player_fwalk_sprite = player.forward_walk.getSpecificFrame((int)player.time_since_last_input % player.forward_walk.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player_fwalk.get(), &player_fwalk_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                        };
+                    }
+                    if (is_grounded(player2, game_map)) {
+                        player2.time_since_last_input = 0;
+                        player2.time_since_last_input += dt;
+                        if (event.key.keysym.scancode == SDL_SCANCODE_UP) {
+                            //auto player2_jump_sprite = player2.jump.getSpecificFrame((int)game_time % player2.jump.getFrameCount());
+                            //SDL_RenderCopyEx(renderer, player2_jump.get(), &player2_jump_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
+                            auto player2_crouch_sprite1 = player2.crouch.getSpecificFrame(0);
+                            auto player2_crouch_sprite2 = player2.crouch.getSpecificFrame(1);
+                            SDL_RenderCopyEx(renderer, player2_crouch.get(), &player2_crouch_sprite1, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                            SDL_RenderCopyEx(renderer, player2_crouch.get(), &player2_crouch_sprite2, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
+                            auto player2_fwalk_sprite = player2.forward_walk.getSpecificFrame((int)player2.time_since_last_input % player2.forward_walk.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player2_fwalk.get(), &player2_fwalk_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                        if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
+                            auto player2_bwalk_sprite = player2.back_walk.getSpecificFrame((int)player2.time_since_last_input % player2.back_walk.getFrameCount());
+                            SDL_RenderCopyEx(renderer, player2_bwalk.get(), &player2_bwalk_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                        };
+                    }
+
+                    break;
+                }
+                case SDL_KEYUP: {
+                    if (event.key.keysym.scancode == SDL_SCANCODE_O) still_playing = false;
+
+                    if (event.key.keysym.scancode == SDL_SCANCODE_W) player.a.v.y = 0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_S) player.a.v.y = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_A) player.a.v.x = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_D) player.a.v.x = 0;
+
+                    if (event.key.keysym.scancode == SDL_SCANCODE_UP) player2.a.v.y = 0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player2.a.v.y = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player2.a.v.x = 0;
+                    if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player2.a.v.x = 0;
+
+
+
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_UP) player.v.v.y = -0;
+                    // // if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) player.v.v.y = 0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) player.v.v.x = -0;
+                    // if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) player.v.v.x = 0;
+
+                    break;
+                }
+                // case SDL_MOUSEMOTION: {
+                //     x = event.motion.x;
+                //     y = event.motion.y;
+                //     break;
+                // }
+                // default: ;
+            }
+        }
 
         // SDL_RenderDrawLine(renderer, 0, 0, x, y);                // linia podążająca za playerem
         // SDL_SetRenderDrawColor(renderer, 0x00, 0xff, 0x00, 0xff);
