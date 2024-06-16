@@ -26,11 +26,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="animations FINALLY work now, albeit a bit slow still&#10;not sure how to fix that yet">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="weird start to multiple animations, will try to make them faster and WORK later&#10;also redid the crouch bitmap">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.bmp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/couchstart/couchstart.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/crouch/crouch.bmp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -75,7 +72,7 @@
     <setting file="file://$PROJECT_DIR$/vendored/SDL/src/render/SDL_sysrender.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectApplicationVersion">
     <option name="ide" value="CLion" />
@@ -193,7 +190,8 @@
       <workItem from="1718234532551" duration="2098000" />
       <workItem from="1718276605288" duration="4584000" />
       <workItem from="1718357844365" duration="4019000" />
-      <workItem from="1718435723566" duration="38773000" />
+      <workItem from="1718435723566" duration="39014000" />
+      <workItem from="1718523523164" duration="17032000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -235,7 +233,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718459173474</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="weird start to multiple animations, will try to make them faster and WORK later&#10;also redid the crouch bitmap">
+      <option name="closed" value="true" />
+      <created>1718504209203</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1718504209203</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -264,6 +270,7 @@
     <MESSAGE value="fixed the shad of cyan for the color key, STILL need to figure out a proper animation function/method" />
     <MESSAGE value="made a cleaner function/method for animating, still gotta figure out how to initialize or malloc for all these arrays" />
     <MESSAGE value="animations FINALLY work now, albeit a bit slow still&#10;not sure how to fix that yet" />
-    <option name="LAST_COMMIT_MESSAGE" value="animations FINALLY work now, albeit a bit slow still&#10;not sure how to fix that yet" />
+    <MESSAGE value="weird start to multiple animations, will try to make them faster and WORK later&#10;also redid the crouch bitmap" />
+    <option name="LAST_COMMIT_MESSAGE" value="weird start to multiple animations, will try to make them faster and WORK later&#10;also redid the crouch bitmap" />
   </component>
 </project>
