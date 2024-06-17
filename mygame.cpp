@@ -338,8 +338,12 @@ player_t update_player(player_t player_old, const game_map_t &map, double dt) {
     // }
 
     if (!is_grounded(player_old, map)) {
-        player_old.a.v.y = 50;  // przyspieszenie ziemskie
-        player_old.a.v.x = player_old.a.v.x * 0.9;
+        if (player_old.currentAttack == player_t::airS) {
+            player_old.a.v.y = 1000;
+        } else {
+            player_old.a.v.y = 50;  // przyspieszenie ziemskie
+            player_old.a.v.x = player_old.a.v.x * 0.9;
+        }
     }
 
     player.p = player_old.p + (player_old.v * dt) + (player_old.a*dt*dt)*0.5;
@@ -514,7 +518,7 @@ int main(int argc, char *argv[])
     auto player_airL = player.air_attackL.load_sheet(renderer, "PEPPINO Sprites/machpunch/machpunch.bmp", 100, 100, 95, 96, 10, 20.0);
     auto player_airM = player.air_attackM.load_sheet(renderer, "PEPPINO Sprites/slapup/slapup.bmp", 200, 200, 150, 155, 7, 20.0);
     auto player_airH = player.air_attackH.load_sheet(renderer, "PEPPINO Sprites/knock/knock.bmp", 100, 100, 85, 96, 7, 20.0);
-    auto player_airS = player.air_attackS.load_sheet(renderer, "PEPPINO Sprites/slap/slap.bmp", 100, 100, 80, 96, 7, 20.0);
+    auto player_airS = player.air_attackS.load_sheet(renderer, "PEPPINO Sprites/shoulder/shoulder.bmp", 100, 100, 80, 96, 7, 20.0);
 
     auto player2_idle = player2.idle.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5, 12.0);
     auto player2_fwalk = player2.forward_walk.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Forward.bmp", 60, 50, 48, 50, 6, 12.0);
@@ -527,14 +531,14 @@ int main(int argc, char *argv[])
     auto player2_ffall = player2.forward_fall.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5, 12.0);
     auto player2_bfall = player2.backward_fall.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5, 12.0);
 
-    auto player2_attackL = player2.attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 20.0);
-    auto player2_attackM = player2.attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 20.0);
-    auto player2_attackH = player2.attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 20.0);
-    auto player2_attackS = player2.attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 20.0);
-    auto player2_airL = player2.air_attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 20.0);
-    auto player2_airM = player2.air_attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 20.0);
-    auto player2_airH = player2.air_attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 20.0);
-    auto player2_airS = player2.air_attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 20.0);
+    auto player2_attackL = player2.attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 15.0);
+    auto player2_attackM = player2.attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 15.0);
+    auto player2_attackH = player2.attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 10.0);
+    auto player2_attackS = player2.attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 8.0);
+    auto player2_airL = player2.air_attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 15.0);
+    auto player2_airM = player2.air_attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 15.0);
+    auto player2_airH = player2.air_attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 10.0);
+    auto player2_airS = player2.air_attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 8.0);
 
     double game_time = 0.;
     player.time_since_last_input = 0;
@@ -544,6 +548,16 @@ int main(int argc, char *argv[])
         // events
         SDL_Event event;
         while(SDL_PollEvent(&event)) {
+            if (is_grounded(player, game_map)) {
+                player.is_falling = false;
+                player.is_falling_forward = false;
+                player.is_falling_backward = false;
+            }
+            if (is_grounded(player2, game_map)) {
+                player2.is_falling = false;
+                player2.is_falling_forward = false;
+                player2.is_falling_backward = false;
+            }
             switch (event.type) {
                 case SDL_QUIT: {
                     still_playing = false;
@@ -559,20 +573,29 @@ int main(int argc, char *argv[])
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_S) {
                             player.a.v.x = 0;
+                            if (player.is_attacking) {
+                                player.is_crouching = false;
+                            };
                             player.is_walking_backward = false;
                             player.is_walking_forward = false;
 
                             player.is_crouching = true;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_A) {
-                            if (!is_grounded(player, game_map)) {
+                            if (player.is_attacking || player.is_crouching) {
+                                player.is_walking_backward = false;
+                                player.a.v.x = 0;
+                            } else if (!is_grounded(player, game_map) && !player.is_attacking) {
                                 player.is_walking_backward = false;
                                 player.is_jumping_backward = true;
                             } else player.is_walking_backward = true;
                             player.a.v.x = -40;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_D) {
-                            if (!is_grounded(player, game_map)) {
+                            if (player.is_attacking || player.is_crouching) {
+                                player.is_walking_forward = false;
+                                player.a.v.x = 0;
+                            } else if (!is_grounded(player, game_map) && !player.is_attacking) {
                                 player.is_walking_forward = false;
                                 player.is_jumping_forward = true;
                             } else player.is_walking_forward = true;
@@ -584,12 +607,12 @@ int main(int argc, char *argv[])
                             player.currentAttack = player_t::groundL;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_M) {
-                            player.a.v.x = 9;
+                            player.v.v.x = 13;
                             player.is_attacking = true;
                             player.currentAttack = player_t::groundM;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_J) {
-                            player.a.v.x = 16;
+                            player.v.v.x = 20;
                             player.is_attacking = true;
                             player.currentAttack = player_t::groundH;
                         };
@@ -601,7 +624,7 @@ int main(int argc, char *argv[])
                     }
                     else {
                         if (event.key.keysym.scancode == SDL_SCANCODE_N) {
-                            player.a.v.x = 1;
+                            player.a.v.x = 10;
                             player.is_attacking = true;
                             player.currentAttack = player_t::airL;
                         };
@@ -616,8 +639,8 @@ int main(int argc, char *argv[])
                             player.currentAttack = player_t::airH;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_K) {
-                            player.a.v.x = 5;
-                            player.a.v.y = 200;
+                            player.a.v.x = 30;
+                            // player.a.v.y = 40000;
                             player.is_attacking = true;
                             player.currentAttack = player_t::airS;
                         };
@@ -631,20 +654,29 @@ int main(int argc, char *argv[])
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_DOWN) {
                             player2.a.v.x = 0;
+                            if (player2.is_attacking) {
+                                player2.is_crouching = false;
+                            };
                             player2.is_walking_backward = false;
                             player2.is_walking_forward = false;
 
                             player2.is_crouching = true;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
-                            if (!is_grounded(player2, game_map)) {
+                            if (player2.is_attacking || player2.is_crouching) {
+                                player2.is_walking_forward = false;
+                                player2.a.v.x = 0;
+                            } else if (!is_grounded(player2, game_map) && !player2.is_attacking) {
                                 player2.is_walking_forward = false;
                                 player2.is_jumping_forward = true;
                             } else player2.is_walking_forward = true;
                             player2.a.v.x = -35;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
-                            if (!is_grounded(player2, game_map)) {
+                            if (player2.is_attacking || player2.is_crouching) {
+                                player2.is_walking_backward = false;
+                                player2.a.v.x = 0;
+                            } else if (!is_grounded(player2, game_map) && !player2.is_attacking) {
                                 player2.is_walking_backward = false;
                                 player2.is_jumping_backward = true;
                             } else player2.is_walking_backward = true;
@@ -657,7 +689,7 @@ int main(int argc, char *argv[])
                             player2.currentAttack = player_t::groundL;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_KP_2) {
-                            player2.a.v.x = -1;
+                            player2.a.v.x = -4;
                             player2.is_attacking = true;
                             player2.currentAttack = player_t::groundM;
                         };
@@ -667,8 +699,8 @@ int main(int argc, char *argv[])
                             player2.currentAttack = player_t::groundH;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_KP_5) {
-                            player2.a.v.x = -2;
-                            player2.a.v.y = -50;
+                            player2.a.v.x = -20;
+                            player2.a.v.y = -2050;
                             player2.is_attacking = true;
                             player2.currentAttack = player_t::groundS;
                         };
@@ -680,7 +712,7 @@ int main(int argc, char *argv[])
                             player2.currentAttack = player_t::airL;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_KP_2) {
-                            player2.a.v.x = -1;
+                            player2.a.v.x = -2;
                             player2.is_attacking = true;
                             player2.currentAttack = player_t::airM;
                         };
@@ -690,8 +722,8 @@ int main(int argc, char *argv[])
                             player2.currentAttack = player_t::airH;
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_KP_5) {
-                            player2.a.v.x = -2;
-                            player2.a.v.y = -20;
+                            player2.a.v.x = -12;
+                            player2.a.v.y = -1800;
                             player2.is_attacking = true;
                             player2.currentAttack = player_t::airS;
                         };
@@ -711,17 +743,13 @@ int main(int argc, char *argv[])
                         //     player.is_falling = true;
                         // }
                         player.a.v.y = 0;
-                        if (player.is_jumping_forward) {
-                            player.is_jumping_forward = false;
-                        } else if (player.is_jumping_backward) {
-                            player.is_jumping_backward = false;
-                        }
+                        // if (player.is_jumping_forward) {
+                        //     player.is_jumping_forward = false;
+                        // } else if (player.is_jumping_backward) {
+                        //     player.is_jumping_backward = false;
+                        // }
                         player.is_jumping = false;
-                        if (is_grounded(player, game_map)) {
-                            player.is_falling = false;
-                            player.is_falling_forward = false;
-                            player.is_falling_backward = false;
-                        }
+                        player.is_falling = true; //???
                     };
                     if (event.key.keysym.scancode == SDL_SCANCODE_S) {
                         player.a.v.y = 0;
@@ -729,11 +757,17 @@ int main(int argc, char *argv[])
                     };
                     if (event.key.keysym.scancode == SDL_SCANCODE_A) {
                         player.a.v.x = 0;
+                        if (!is_grounded(player, game_map)) {
+                            player.is_falling_backward = true;
+                        }
                         player.is_walking_backward = false;
                         player.is_jumping_backward = false;
                     };
                     if (event.key.keysym.scancode == SDL_SCANCODE_D) {
                         player.a.v.x = 0;
+                        if (!is_grounded(player, game_map)) {
+                            player.is_falling_forward = true;
+                        }
                         player.is_walking_forward = false;
                         player.is_jumping_forward = false;
                     };
@@ -764,13 +798,13 @@ int main(int argc, char *argv[])
                         //     // player2.is_falling = true;
                         // }
                         player2.a.v.y = 0;
-                        if (player2.is_jumping_forward) {
-                            player2.is_jumping_forward = false;
-                            player2.is_falling_forward = true;
-                        } else if (player2.is_jumping_backward) {
-                            player2.is_jumping_backward = false;
-                            player2.is_falling_backward = true;
-                        }
+                        // if (player2.is_jumping_forward) {
+                        //     player2.is_jumping_forward = false;
+                        //     player2.is_falling_forward = true;
+                        // } else if (player2.is_jumping_backward) {
+                        //     player2.is_jumping_backward = false;
+                        //     player2.is_falling_backward = true;
+                        // }
                         player2.is_jumping = false;
                         if (is_grounded(player2, game_map)) {
                             player2.is_falling = false;
@@ -784,11 +818,17 @@ int main(int argc, char *argv[])
                     };
                     if (event.key.keysym.scancode == SDL_SCANCODE_LEFT) {
                         player2.a.v.x = 0;
+                        if (!is_grounded(player, game_map)) {
+                            player2.is_falling_forward = true;
+                        }
                         player2.is_walking_forward = false;
                         player2.is_jumping_forward = false;
                     };
                     if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT) {
                         player2.a.v.x = 0;
+                        if (!is_grounded(player, game_map)) {
+                            player2.is_falling_backward = true;
+                        }
                         player2.is_walking_backward = false;
                         player2.is_jumping_backward = false;
                     };
@@ -873,7 +913,7 @@ int main(int argc, char *argv[])
 
         if (!player.is_jumping && !player.is_crouching && !player.is_walking_backward
         && !player.is_walking_forward && !player.is_jumping_backward && !player.is_jumping_forward
-        && !player.is_falling && !player.is_falling_backward && !player.is_falling_forward) {
+        && !player.is_falling && !player.is_falling_backward && !player.is_falling_forward && !player.is_attacking) {
             auto player_idle_sprite = player.idle.getSpecificFrame((int)floor(game_time / (1.0/player.idle.getAnimSpeed())) % player.idle.getFrameCount());
             SDL_RenderCopyEx(renderer, player_idle.get(), &player_idle_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
         }
@@ -920,6 +960,8 @@ int main(int argc, char *argv[])
             SDL_RenderCopyEx(renderer, player_bfall.get(), &player_bfall_sprite, &player_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         }
         if (player.is_crouching) {
+            player.is_walking_forward = false;
+            player.is_walking_backward = false;
             auto player_crouch_sprite = player.crouch.getSpecificFrame((int)floor(game_time / (1.0/player.crouch.getAnimSpeed())) % player.crouch.getFrameCount());
             SDL_RenderCopyEx(renderer, player_crouch.get(), &player_crouch_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
         }
@@ -932,42 +974,72 @@ int main(int argc, char *argv[])
             SDL_RenderCopyEx(renderer, player_bwalk.get(), &player_bwalk_sprite, &player_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         }
         if (player.is_attacking) {
-            switch (player.currentAttack) {
-                case player_t::groundL: {
-                    auto player_attackL_sprite = player.attackL.getSpecificFrame((int)floor(game_time / (1.0/player.attackL.getAnimSpeed())) % player.attackL.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_attackL.get(), &player_attackL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            player.is_walking_forward = false;
+            player.is_walking_backward = false;
+            player.is_crouching = false;
+            if (player.currentAttack == player_t::groundL) {
+                int groundL_frame = (int)floor(player.time_since_last_input / (1.0/player.attackL.getAnimSpeed())) % player.attackL.getFrameCount();
+                auto player_attackL_sprite = player.attackL.getSpecificFrame(groundL_frame);
+                SDL_RenderCopyEx(renderer, player_attackL.get(), &player_attackL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (groundL_frame == player.attackL.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::groundM: {
-                    auto player_attackM_sprite = player.attackM.getSpecificFrame((int)floor(game_time / (1.0/player.attackM.getAnimSpeed())) % player.attackM.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_attackM.get(), &player_attackM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::groundM) {
+                int groundM_frame = (int)floor(player.time_since_last_input / (1.0/player.attackM.getAnimSpeed())) % player.attackM.getFrameCount();
+                auto player_attackM_sprite = player.attackM.getSpecificFrame(groundM_frame);
+                SDL_RenderCopyEx(renderer, player_attackM.get(), &player_attackM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (groundM_frame == player.attackM.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::groundH: {
-                    auto player_attackH_sprite = player.attackH.getSpecificFrame((int)floor(game_time / (1.0/player.attackH.getAnimSpeed())) % player.attackH.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_attackH.get(), &player_attackH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::groundH) {
+                int groundH_frame = (int)floor(player.time_since_last_input / (1.0/player.attackH.getAnimSpeed())) % player.attackH.getFrameCount();
+                auto player_attackH_sprite = player.attackH.getSpecificFrame(groundH_frame);
+                SDL_RenderCopyEx(renderer, player_attackH.get(), &player_attackH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (groundH_frame == player.attackH.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::groundS: {
-                    auto player_attackS_sprite = player.attackS.getSpecificFrame((int)floor(game_time / (1.0/player.attackS.getAnimSpeed())) % player.attackS.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_attackS.get(), &player_attackS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::groundS) {
+                int groundS_frame = (int)floor(player.time_since_last_input / (1.0/player.attackS.getAnimSpeed())) % player.attackS.getFrameCount();
+                auto player_attackS_sprite = player.attackS.getSpecificFrame(groundS_frame);
+                SDL_RenderCopyEx(renderer, player_attackS.get(), &player_attackS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (groundS_frame == player.attackS.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::airL: {
-                    auto player_airL_sprite = player.air_attackL.getSpecificFrame((int)floor(game_time / (1.0/player.air_attackL.getAnimSpeed())) % player.air_attackL.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_airL.get(), &player_airL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::airL) {
+                int airL_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackL.getAnimSpeed())) % player.air_attackL.getFrameCount();
+                auto player_airL_sprite = player.air_attackL.getSpecificFrame(airL_frame);
+                SDL_RenderCopyEx(renderer, player_airL.get(), &player_airL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (airL_frame == player.air_attackL.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::airM: {
-                    auto player_airM_sprite = player.air_attackM.getSpecificFrame((int)floor(game_time / (1.0/player.air_attackM.getAnimSpeed())) % player.air_attackM.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_airM.get(), &player_airM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::airM) {
+                int airM_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackM.getAnimSpeed())) % player.air_attackM.getFrameCount();
+                auto player_airM_sprite = player.air_attackM.getSpecificFrame(airM_frame);
+                SDL_RenderCopyEx(renderer, player_airM.get(), &player_airM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (airM_frame == player.air_attackM.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::airH: {
-                    auto player_airH_sprite = player.air_attackH.getSpecificFrame((int)floor(game_time / (1.0/player.air_attackH.getAnimSpeed())) % player.air_attackH.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_airH.get(), &player_airH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::airH) {
+                int airH_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackH.getAnimSpeed())) % player.air_attackH.getFrameCount();
+                auto player_airH_sprite = player.air_attackH.getSpecificFrame(airH_frame);
+                SDL_RenderCopyEx(renderer, player_airH.get(), &player_airH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (airH_frame == player.air_attackH.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::airS: {
-                    auto player_airS_sprite = player.air_attackS.getSpecificFrame((int)floor(game_time / (1.0/player.air_attackS.getAnimSpeed())) % player.air_attackS.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player_airS.get(), &player_airS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+            }
+            else if (player.currentAttack == player_t::airS) {
+                int airS_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackS.getAnimSpeed())) % player.air_attackS.getFrameCount();
+                auto player_airS_sprite = player.air_attackS.getSpecificFrame(airS_frame);
+                SDL_RenderCopyEx(renderer, player_airS.get(), &player_airS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                if (airS_frame == player.air_attackS.getFrameCount()) {
+                    player.is_attacking = false;
                 }
-                case player_t::NONE:
-                    break;
-                // default: ;
             }
         }
         // if (player.is_blocking) {
@@ -975,7 +1047,7 @@ int main(int argc, char *argv[])
         // }
         if (!player2.is_jumping && !player2.is_crouching && !player2.is_walking_backward
         && !player2.is_walking_forward && !player2.is_jumping_backward && !player2.is_jumping_forward
-        && !player2.is_falling && !player2.is_falling_backward && !player2.is_falling_forward) {
+        && !player2.is_falling && !player2.is_falling_backward && !player2.is_falling_forward && !player2.is_attacking) {
             auto player2_idle_sprite = player2.idle.getSpecificFrame((int)floor(game_time / (1.0/player2.idle.getAnimSpeed())) % player2.idle.getFrameCount());
             SDL_RenderCopyEx(renderer, player2_idle.get(), &player2_idle_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         }
@@ -1034,44 +1106,75 @@ int main(int argc, char *argv[])
             SDL_RenderCopyEx(renderer, player2_bwalk.get(), &player2_bwalk_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
         }
         if (player2.is_attacking) {
-            switch (player2.currentAttack) {
-                case player_t::groundL: {
-                    auto player2_attackL_sprite = player2.attackL.getSpecificFrame((int)floor(game_time / (1.0/player2.attackL.getAnimSpeed())) % player2.attackL.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_attackL.get(), &player2_attackL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            player2.is_walking_forward = false;
+            player2.is_walking_backward = false;
+            player2.is_crouching = false;
+            if (player2.currentAttack == player_t::groundL) {
+                int groundL2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackL.getAnimSpeed())) % player2.attackL.getFrameCount();
+                auto player2_attackL_sprite = player2.attackL.getSpecificFrame(groundL2_frame);
+                SDL_RenderCopyEx(renderer, player2_attackL.get(), &player2_attackL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (groundL2_frame == player2.attackL.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::groundM: {
-                    auto player2_attackM_sprite = player2.attackM.getSpecificFrame((int)floor(game_time / (1.0/player2.attackM.getAnimSpeed())) % player2.attackM.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_attackM.get(), &player2_attackM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::groundM) {
+                int groundM2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackM.getAnimSpeed())) % player2.attackM.getFrameCount();
+                auto player2_attackM_sprite = player2.attackM.getSpecificFrame(groundM2_frame);
+                SDL_RenderCopyEx(renderer, player2_attackM.get(), &player2_attackM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (groundM2_frame == player2.attackM.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::groundH: {
-                    auto player2_attackH_sprite = player2.attackH.getSpecificFrame((int)floor(game_time / (1.0/player2.attackH.getAnimSpeed())) % player2.attackH.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_attackH.get(), &player2_attackH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::groundH) {
+                int groundH2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackH.getAnimSpeed())) % player2.attackH.getFrameCount();
+                auto player2_attackH_sprite = player2.attackH.getSpecificFrame(groundH2_frame);
+                SDL_RenderCopyEx(renderer, player2_attackH.get(), &player2_attackH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (groundH2_frame == player2.attackH.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::groundS: {
-                    auto player2_attackS_sprite = player2.attackS.getSpecificFrame((int)floor(game_time / (1.0/player2.attackS.getAnimSpeed())) % player2.attackS.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_attackS.get(), &player2_attackS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::groundS) {
+                int groundS2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackS.getAnimSpeed())) % player2.attackS.getFrameCount();
+                auto player2_attackS_sprite = player2.attackS.getSpecificFrame(groundS2_frame);
+                SDL_RenderCopyEx(renderer, player2_attackS.get(), &player2_attackS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (groundS2_frame == player2.attackS.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::airL: {
-                    auto player2_airL_sprite = player2.air_attackL.getSpecificFrame((int)floor(game_time / (1.0/player2.air_attackL.getAnimSpeed())) % player2.air_attackL.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_airL.get(), &player2_airL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::airL) {
+                int airL2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackL.getAnimSpeed())) % player2.air_attackL.getFrameCount();
+                auto player2_airL_sprite = player2.air_attackL.getSpecificFrame(airL2_frame);
+                SDL_RenderCopyEx(renderer, player2_airL.get(), &player2_airL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (airL2_frame == player2.air_attackL.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::airM: {
-                    auto player2_airM_sprite = player2.air_attackM.getSpecificFrame((int)floor(game_time / (1.0/player2.air_attackM.getAnimSpeed())) % player2.air_attackM.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_airM.get(), &player2_airM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::airM) {
+                int airM2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackM.getAnimSpeed())) % player2.air_attackM.getFrameCount();
+                auto player2_airM_sprite = player2.air_attackM.getSpecificFrame(airM2_frame);
+                SDL_RenderCopyEx(renderer, player2_airM.get(), &player2_airM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (airM2_frame == player2.air_attackM.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::airH: {
-                    auto player2_airH_sprite = player2.air_attackH.getSpecificFrame((int)floor(game_time / (1.0/player2.air_attackH.getAnimSpeed())) % player2.air_attackH.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_airH.get(), &player2_airH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::airH) {
+                int airH2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackH.getAnimSpeed())) % player2.air_attackH.getFrameCount();
+                auto player2_airH_sprite = player2.air_attackH.getSpecificFrame(airH2_frame);
+                SDL_RenderCopyEx(renderer, player2_airH.get(), &player2_airH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (airH2_frame == player2.air_attackH.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::airS: {
-                    auto player2_airS_sprite = player2.air_attackS.getSpecificFrame((int)floor(game_time / (1.0/player2.air_attackS.getAnimSpeed())) % player2.air_attackS.getFrameCount());
-                    SDL_RenderCopyEx(renderer, player2_airS.get(), &player2_airS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+            }
+            else if (player2.currentAttack == player_t::airS) {
+                int airS2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackS.getAnimSpeed())) % player2.air_attackS.getFrameCount();
+                auto player2_airS_sprite = player2.air_attackS.getSpecificFrame(airS2_frame);
+                SDL_RenderCopyEx(renderer, player2_airS.get(), &player2_airS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                if (airS2_frame == player2.air_attackS.getFrameCount()) {
+                    player2.is_attacking = false;
                 }
-                case player_t::NONE:
-                    break;
-                // default: ;
             }
         }
+
         // if (player2.is_blocking) {
         //
         // }
