@@ -26,7 +26,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="wonky implementation of attack buttons, still have to separate them somehow&#10;after that we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="attack buttons have been separated&#10;now we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
@@ -192,7 +192,7 @@
       <workItem from="1718357844365" duration="4019000" />
       <workItem from="1718435723566" duration="39014000" />
       <workItem from="1718523523164" duration="26965000" />
-      <workItem from="1718636671110" duration="6524000" />
+      <workItem from="1718636671110" duration="23773000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -258,7 +258,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718589944814</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="attack buttons have been separated&#10;now we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations">
+      <option name="closed" value="true" />
+      <created>1718650985004</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1718650985004</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -290,6 +298,7 @@
     <MESSAGE value="weird start to multiple animations, will try to make them faster and WORK later&#10;also redid the crouch bitmap" />
     <MESSAGE value="multiple animations work greatly and with appropriate speed to boot&#10;still need to figure out falling, forward/backward jumps and forward/backward falling, but honestly that's whatever at this point&#10;also changed Pep's hurtbox so that it doesn't clip into the floor" />
     <MESSAGE value="wonky implementation of attack buttons, still have to separate them somehow&#10;after that we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="wonky implementation of attack buttons, still have to separate them somehow&#10;after that we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
+    <MESSAGE value="attack buttons have been separated&#10;now we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
+    <option name="LAST_COMMIT_MESSAGE" value="attack buttons have been separated&#10;now we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
   </component>
 </project>

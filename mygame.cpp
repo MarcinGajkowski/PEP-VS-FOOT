@@ -9,6 +9,8 @@
 #include <vector>
 
 // #include "SDL_image.h"
+#include <set>
+
 #include "vendored/sdl/include/SDL.h"
 #include "vendored/sdl/include/SDL_events.h"
 #include "vendored/sdl/include/SDL_video.h"
@@ -71,63 +73,18 @@ std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::strin
     return {texture, [](SDL_Texture *t) { SDL_DestroyTexture(t); } };
 }
 
-// class LAnimatedTexture
-// {
-// public:
-//     LAnimatedTexture();                     //Initializes variables
-//
-//     ~LAnimatedTexture();                    //Deallocates memory
-//
-//     std::shared_ptr<SDL_Texture> load_image(SDL_Renderer *renderer, const std::string &filename);   //Loads image at specified path
-//
-//     void free();                            //Deallocates texture
-//
-//     void render(SDL_Renderer *renderer, const std::string &filename, int width, int height,  int frames, int frameDelay);   //Renders texture at given point
-//
-//     int getWidth();                         //Gets image dimensions
-//     int getHeight();
-//
-//     SDL_Texture* getTexture();              // HOPEFULLY gets the hardware texture
-//
-// private:
-//     SDL_Texture* mTexture;                  //The actual hardware texture
-//
-//     int mWidth;                             //Image dimensions
-//     int mHeight;
-// };
-//
-// LAnimatedTexture::LAnimatedTexture()
-// {
-//     mTexture = nullptr;
-//     mWidth = 0;
-//     mHeight = 0;
-// }
-//
-// LAnimatedTexture::~LAnimatedTexture()
-// {
-//     free();
-// }
-
-// void LAnimatedTexture::free()
-// {
-//     if( mTexture != nullptr )              // Free texture if it exists
-//     {
-//         SDL_DestroyTexture( mTexture );
-//         mTexture = nullptr;
-//         mWidth = 0;
-//         mHeight = 0;
-//     }
-// }
-
 class Move {
 public:
     std::shared_ptr<SDL_Texture> load_sheet(SDL_Renderer *renderer, const std::string &filename, int width, int height,
                                               int hurtboxW, int hurtboxH, int frames, double speed);
-    SDL_Rect getSpecificFrame(int frame);
+    SDL_Rect getSpecificFrame(int frame) const;
     int getFrameCount() const;
     double getAnimSpeed() const;
-    SDL_Rect getHitbox();
-    void setHitbox(SDL_Renderer *renderer, int x, int y, int w, int h, int onHit, int onBlock, int hitstun);
+    SDL_Rect getHitbox() const;
+    void setHitbox(int x, int y, int w, int h, int onHit, int onBlock, int hitstun, int firstActiveFrame, int lastActiveFrame);
+    bool isActive() const;
+    void setActive(bool isItActiveTho) const;
+    void showHitbox(SDL_Renderer *renderer, double timer) const;
     // Move() = default;
     // Move(Move* m, const int hit, const int block, const int hitstun, SDL_Rect frames[]) {
     //     damage_on_hit = hit;
@@ -140,6 +97,9 @@ private:
     SDL_Texture* sprite_sheet = {};
     int frame_count = 0;
     double anim_speed = 0;
+    mutable bool is_active = false;
+    int first_active_frame = 0;
+    int last_active_frame = 0;
     int damage_on_hit = 0;
     int damage_on_block = 0;
     int hitstun_frames = 0;
@@ -177,21 +137,11 @@ std::shared_ptr<SDL_Texture> Move::load_sheet(SDL_Renderer *renderer, const std:
         }
     }
 
-    // renderQuad.x = frame_list[ idx ].x;
-    // renderQuad.y = frame_list[ idx ].y;
-    // renderQuad.w = frame_list[ idx ].w;
-    // renderQuad.h = frame_list[ idx ].h;
-
-    // SDL_RenderPresent(renderer);
-    // ++currentFrame;
-    // if (currentFrame/frameDelay >= frames) {
-    //     currentFrame = 0;
-    // }
     SDL_FreeSurface(surface);
     return {texture, [](SDL_Texture *t) { SDL_DestroyTexture(t); } };
 }
 
-SDL_Rect Move::getSpecificFrame(int frame) {
+SDL_Rect Move::getSpecificFrame(int frame) const {
     return frame_list.at(frame);
 }
 
@@ -203,11 +153,11 @@ double Move::getAnimSpeed() const {
     return anim_speed;
 }
 
-SDL_Rect Move::getHitbox() {
+SDL_Rect Move::getHitbox() const {
     return hitbox;
 }
 
-void Move::setHitbox(SDL_Renderer *renderer, int x, int y, int w, int h, int onHit, int onBlock, int hitstun) {
+void Move::setHitbox(int x, int y, int w, int h, int onHit, int onBlock, int hitstun, int firstActiveFrame, int lastActiveFrame) {
     hitbox.x = x;
     hitbox.y = y;
     hitbox.w = w;
@@ -215,21 +165,28 @@ void Move::setHitbox(SDL_Renderer *renderer, int x, int y, int w, int h, int onH
     damage_on_hit = onHit;
     damage_on_block = onBlock;
     hitstun_frames = hitstun;
-    SDL_SetRenderDrawColor(renderer, 255,0,0, 0xFF);
-    SDL_RenderFillRect(renderer, &hitbox);
+    if (firstActiveFrame < 0) firstActiveFrame = 0;
+    if (lastActiveFrame >= frame_count) lastActiveFrame = frame_count;
+    first_active_frame = firstActiveFrame;
+    last_active_frame = lastActiveFrame;
 }
 
-// int LAnimatedTexture::getWidth() {                                // ??? we'll see
-//     return mWidth;
-// }
-//
-// int LAnimatedTexture::getHeight() {
-//     return mHeight;
-// }
-//
-// SDL_Texture* LAnimatedTexture::getTexture() {
-//     return mTexture;
-// }
+bool Move::isActive() const {
+    return is_active;
+}
+
+void Move::setActive(bool isItActiveTho) const {
+    is_active = isItActiveTho;
+}
+
+void Move::showHitbox(SDL_Renderer *renderer, double timer) const {
+    int active_frame = (int)floor(timer / (1.0/anim_speed)) % frame_count;
+    if (active_frame >= first_active_frame - 1 && active_frame <= last_active_frame - 1) {
+        setActive(true);
+        SDL_SetRenderDrawColor(renderer, 255,0,0, 0xFF);
+        SDL_RenderFillRect(renderer, &hitbox);
+    } else setActive(false);
+}
 
 union vect_t {                                     // można użyć jako albo [x,y] albo tablicę 2-wymiarową
     struct { double x; double y;} v;
@@ -254,7 +211,7 @@ struct player_t {
     vect_t p; // position
     vect_t v; // velocity
     vect_t a; // acceleration
-    int health = 100;
+    float health = 100.0;
     // int num;
     // enum character { PEPPINO, FOOTSIES };
     double time_since_last_input;
@@ -301,16 +258,6 @@ struct player_t {
     // Move hurt{};
     // Move dead{};
 };
-
-// struct player_t* createPlayer(struct player_t *pl, vect_t p, vect_t v, vect_t a) {
-//     pl = static_cast<player_t *>(malloc(sizeof(*pl) + sizeof(Move) * 16) + sizeof(double) * 6);
-//
-//     pl->p = p;
-//     pl->v = v;
-//     pl->a = a;
-//     return pl;
-// }
-
 
 bool is_colliding(vect_t position, const game_map_t &map) {
     return map.get(position.v.x, position.v.y) > 0;
@@ -437,6 +384,26 @@ void draw_map(SDL_Renderer *renderer, game_map_t & map, const std::shared_ptr<SD
     }
 }
 
+void healthBar(SDL_Renderer *renderer, player_t player, int x, int y, int w, int h, const SDL_Color bg_color, const SDL_Color hp_color) {
+    player.health = player.health > 1.f ?
+        1.f : player.health < 0.f ?
+        0.f : player.health;
+
+    SDL_Color old_color;
+    SDL_GetRenderDrawColor(renderer, &old_color.r, &old_color.g, &old_color.b, &old_color.a);
+
+    SDL_Rect bg_rect = {x, y, w, h};
+    SDL_SetRenderDrawColor(renderer, bg_color.r, bg_color.g, bg_color.b, bg_color.a);
+    SDL_RenderFillRect(renderer, &bg_rect);
+    SDL_SetRenderDrawColor(renderer, hp_color.r, hp_color.g, hp_color.b, hp_color.a);
+
+    int perc_w = (int)((float)w * player.health);
+    int perc_x = x + (w - perc_w);
+    SDL_Rect hp_rect = { perc_x, y, perc_w, h};
+    SDL_RenderFillRect(renderer, &hp_rect);
+    SDL_SetRenderDrawColor(renderer, old_color.r, old_color.g, old_color.b, old_color.a);
+}
+
 int main(int argc, char *argv[])
 {
     using namespace std::chrono_literals;
@@ -447,20 +414,12 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     double dt = 1./60.;
-    // Uint32 ticks = SDL_GetTicks();
-    // const Uint32 anim_speed = ticks / 100;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't initialize SDL: %s", SDL_GetError(), NULL);
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
         return 3;
     }
-
-    /*if (SDL_CreateWindowAndRenderer(1280, 720, SDL_WINDOW_RESIZABLE, &window, &renderer) < 0) {
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create window and renderer: %s", SDL_GetError(), NULL);
-        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
-        return 3;
-    }*/
 
     if (!window) {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Couldn't create window: %s", SDL_GetError(), NULL);
@@ -474,10 +433,13 @@ int main(int argc, char *argv[])
         return 3;
     }
 
-    // auto player_texture = load_image(renderer, "player.bmp");
     // auto clouds_texture = load_image(renderer, "clouds.bmp");
     auto tiles_texture = load_image(renderer, "tiles.bmp");
     auto bg_texture = load_image(renderer, "background.bmp");
+
+    SDL_Color bg_color = {0, 162, 232, 255};
+
+    SDL_Color hp_color = {255, 0, 0, 255};
 
     bool still_playing = true;
     player_t player;
@@ -512,13 +474,21 @@ int main(int argc, char *argv[])
     auto player_bfall = player.backward_fall.load_sheet(renderer, "PEPPINO Sprites/fall2/fall2.bmp", 100, 100, 90, 96, 3, 20.0);
 
     auto player_attackL = player.attackL.load_sheet(renderer, "PEPPINO Sprites/slap/slap.bmp", 200, 100, 130, 96, 12, 20.0);
+    player.attackL.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+72, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-41, 62, 45, 5, 2, 2, 2, 8); //!! dopisać poprawne wg player_rectów
     auto player_attackM = player.attackM.load_sheet(renderer, "PEPPINO Sprites/tackle/tackle.bmp", 100, 100, 98, 96, 8, 20.0);
+    player.attackM.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+52, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-50, 39, 38, 10, 3, 4, 3, 4); //!! dopisać poprawne wg player_rectów
     auto player_attackH = player.attackH.load_sheet(renderer, "PEPPINO Sprites/backkick/backkick.bmp", 100, 100, 100, 96, 8, 20.0);
+    player.attackH.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+55, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-40, 43, 47, 14, 6, 6, 5, 8); //!! dopisać poprawne wg player_rectów
     auto player_attackS = player.attackS.load_sheet(renderer, "PEPPINO Sprites/uppunch/uppunch.bmp", 100, 100, 100, 96, 7, 20.0);
+    player.attackS.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+37, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-0, 39, 50, 19, 8, 8, 4, 7); //!! dopisać poprawne wg player_rectów
     auto player_airL = player.air_attackL.load_sheet(renderer, "PEPPINO Sprites/machpunch/machpunch.bmp", 100, 100, 95, 96, 10, 20.0);
+    player.air_attackL.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+57, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-15, 41, 54, 4, 2, 2, 3, 7); //!! dopisać poprawne wg player_rectów
     auto player_airM = player.air_attackM.load_sheet(renderer, "PEPPINO Sprites/slapup/slapup.bmp", 200, 200, 150, 155, 7, 20.0);
+    player.air_attackM.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+76, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-19, 78, 70, 9, 3, 3, 3, 5); //!! dopisać poprawne wg player_rectów
     auto player_airH = player.air_attackH.load_sheet(renderer, "PEPPINO Sprites/knock/knock.bmp", 100, 100, 85, 96, 7, 20.0);
+    player.air_attackH.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+58, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-24, 36, 48, 13, 7, 7, 4, 5); //!! dopisać poprawne wg player_rectów
     auto player_airS = player.air_attackS.load_sheet(renderer, "PEPPINO Sprites/shoulder/shoulder.bmp", 100, 100, 80, 96, 7, 20.0);
+    player.air_attackS.setHitbox((int)(player.p.v.x*TILE_SIZE-(TILE_SIZE/2))+33, (int)(player.p.v.y*TILE_SIZE-TILE_SIZE-259)-53, 45, 45, 17, 10, 8, 3, 7); //!! dopisać poprawne wg player_rectów
 
     auto player2_idle = player2.idle.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5, 12.0);
     auto player2_fwalk = player2.forward_walk.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Forward.bmp", 60, 50, 48, 50, 6, 12.0);
@@ -532,13 +502,21 @@ int main(int argc, char *argv[])
     auto player2_bfall = player2.backward_fall.load_sheet(renderer, "FOOTSIES Guy Sprites/Idle.bmp", 60, 50, 48, 50, 5, 12.0);
 
     auto player2_attackL = player2.attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 15.0);
+    player2.attackL.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+41, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-23, 15, 20, 7, 2, 1, 3, 3); //!! dopisać poprawne wg player_rectów
     auto player2_attackM = player2.attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 15.0);
+    player2.attackM.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+30, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-39, 26, 10, 11, 5, 4, 3, 3); //!! dopisać poprawne wg player_rectów
     auto player2_attackH = player2.attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 10.0);
+    player2.attackH.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+33, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-16, 26, 19, 17, 8, 7, 6, 6); //!! dopisać poprawne wg player_rectów
     auto player2_attackS = player2.attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 8.0);
+    player2.attackS.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+31, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-1, 18, 33, 23, 12, 10, 3, 4); //!! dopisać poprawne wg player_rectów
     auto player2_airL = player2.air_attackL.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_2.bmp", 60, 50, 55, 50, 5, 15.0);
-    auto player2_airM = player2.air_attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 15.0);
+    player2.air_attackL.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+41, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-23, 15, 20, 4, 2, 1, 3, 3); //!! dopisać poprawne wg player_rectów
+    auto player2_airM = player2.air_attackM.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 8.0);
+    player2.air_attackM.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+31, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-1, 18, 33, 13, 7, 10, 3, 4); //!! dopisać poprawne wg player_rectów
     auto player2_airH = player2.air_attackH.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_1.bmp", 60, 50, 60, 50, 8, 10.0);
-    auto player2_airS = player2.air_attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_3.bmp", 60, 50, 50, 50, 7, 8.0);
+    player2.air_attackH.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+33, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-16, 26, 19, 17, 8, 8, 6, 6); //!! dopisać poprawne wg player_rectów
+    auto player2_airS = player2.air_attackS.load_sheet(renderer, "FOOTSIES Guy Sprites/F00_Attack_0.bmp", 60, 50, 57, 50, 5, 15.0);
+    player2.air_attackS.setHitbox((int)(player2.p.v.x*TILE_SIZE-(TILE_SIZE/2))+30, (int)(player2.p.v.y*TILE_SIZE-TILE_SIZE-375)-39, 26, 10, 19, 5, 5, 3, 3); //!! dopisać poprawne wg player_rectów
 
     double game_time = 0.;
     player.time_since_last_input = 0;
@@ -700,7 +678,7 @@ int main(int argc, char *argv[])
                         };
                         if (event.key.keysym.scancode == SDL_SCANCODE_KP_5) {
                             player2.a.v.x = -20;
-                            player2.a.v.y = -2050;
+                            player2.a.v.y = -1050;
                             player2.is_attacking = true;
                             player2.currentAttack = player_t::groundS;
                         };
@@ -881,6 +859,8 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer);
 
         SDL_RenderCopy(renderer, bg_texture.get(), NULL, NULL);
+        healthBar(renderer, player, 100, 100, 700, 50, bg_color, hp_color);
+        healthBar(renderer, player2, 1800, 100, -700, 50, bg_color, hp_color);
         // SDL_Rect clouds_rect = { x/5, y/5,1280,720};
         // SDL_RenderCopyEx(renderer, clouds_texture.get(), NULL, &clouds_rect, game_time*10, NULL, SDL_FLIP_NONE);
 
@@ -980,7 +960,9 @@ int main(int argc, char *argv[])
             if (player.currentAttack == player_t::groundL) {
                 int groundL_frame = (int)floor(player.time_since_last_input / (1.0/player.attackL.getAnimSpeed())) % player.attackL.getFrameCount();
                 auto player_attackL_sprite = player.attackL.getSpecificFrame(groundL_frame);
+
                 SDL_RenderCopyEx(renderer, player_attackL.get(), &player_attackL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.attackL.showHitbox(renderer, player.time_since_last_input);
                 if (groundL_frame == player.attackL.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -988,7 +970,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::groundM) {
                 int groundM_frame = (int)floor(player.time_since_last_input / (1.0/player.attackM.getAnimSpeed())) % player.attackM.getFrameCount();
                 auto player_attackM_sprite = player.attackM.getSpecificFrame(groundM_frame);
+
                 SDL_RenderCopyEx(renderer, player_attackM.get(), &player_attackM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.attackM.showHitbox(renderer, player.time_since_last_input);
                 if (groundM_frame == player.attackM.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -996,7 +980,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::groundH) {
                 int groundH_frame = (int)floor(player.time_since_last_input / (1.0/player.attackH.getAnimSpeed())) % player.attackH.getFrameCount();
                 auto player_attackH_sprite = player.attackH.getSpecificFrame(groundH_frame);
+
                 SDL_RenderCopyEx(renderer, player_attackH.get(), &player_attackH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.attackH.showHitbox(renderer, player.time_since_last_input);
                 if (groundH_frame == player.attackH.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1004,7 +990,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::groundS) {
                 int groundS_frame = (int)floor(player.time_since_last_input / (1.0/player.attackS.getAnimSpeed())) % player.attackS.getFrameCount();
                 auto player_attackS_sprite = player.attackS.getSpecificFrame(groundS_frame);
+
                 SDL_RenderCopyEx(renderer, player_attackS.get(), &player_attackS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.attackS.showHitbox(renderer, player.time_since_last_input);
                 if (groundS_frame == player.attackS.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1012,7 +1000,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::airL) {
                 int airL_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackL.getAnimSpeed())) % player.air_attackL.getFrameCount();
                 auto player_airL_sprite = player.air_attackL.getSpecificFrame(airL_frame);
+
                 SDL_RenderCopyEx(renderer, player_airL.get(), &player_airL_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.air_attackL.showHitbox(renderer, player.time_since_last_input);
                 if (airL_frame == player.air_attackL.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1020,7 +1010,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::airM) {
                 int airM_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackM.getAnimSpeed())) % player.air_attackM.getFrameCount();
                 auto player_airM_sprite = player.air_attackM.getSpecificFrame(airM_frame);
+
                 SDL_RenderCopyEx(renderer, player_airM.get(), &player_airM_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.air_attackM.showHitbox(renderer, player.time_since_last_input);
                 if (airM_frame == player.air_attackM.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1028,7 +1020,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::airH) {
                 int airH_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackH.getAnimSpeed())) % player.air_attackH.getFrameCount();
                 auto player_airH_sprite = player.air_attackH.getSpecificFrame(airH_frame);
+
                 SDL_RenderCopyEx(renderer, player_airH.get(), &player_airH_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.air_attackH.showHitbox(renderer, player.time_since_last_input);
                 if (airH_frame == player.air_attackH.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1036,7 +1030,9 @@ int main(int argc, char *argv[])
             else if (player.currentAttack == player_t::airS) {
                 int airS_frame = (int)floor(player.time_since_last_input / (1.0/player.air_attackS.getAnimSpeed())) % player.air_attackS.getFrameCount();
                 auto player_airS_sprite = player.air_attackS.getSpecificFrame(airS_frame);
+
                 SDL_RenderCopyEx(renderer, player_airS.get(), &player_airS_sprite, &player_rect, 0, NULL, SDL_FLIP_NONE);
+                player.air_attackS.showHitbox(renderer, player.time_since_last_input);
                 if (airS_frame == player.air_attackS.getFrameCount()) {
                     player.is_attacking = false;
                 }
@@ -1112,7 +1108,9 @@ int main(int argc, char *argv[])
             if (player2.currentAttack == player_t::groundL) {
                 int groundL2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackL.getAnimSpeed())) % player2.attackL.getFrameCount();
                 auto player2_attackL_sprite = player2.attackL.getSpecificFrame(groundL2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_attackL.get(), &player2_attackL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.attackL.showHitbox(renderer, player2.time_since_last_input);
                 if (groundL2_frame == player2.attackL.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1120,7 +1118,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::groundM) {
                 int groundM2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackM.getAnimSpeed())) % player2.attackM.getFrameCount();
                 auto player2_attackM_sprite = player2.attackM.getSpecificFrame(groundM2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_attackM.get(), &player2_attackM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.attackM.showHitbox(renderer, player2.time_since_last_input);
                 if (groundM2_frame == player2.attackM.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1128,7 +1128,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::groundH) {
                 int groundH2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackH.getAnimSpeed())) % player2.attackH.getFrameCount();
                 auto player2_attackH_sprite = player2.attackH.getSpecificFrame(groundH2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_attackH.get(), &player2_attackH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.attackH.showHitbox(renderer, player2.time_since_last_input);
                 if (groundH2_frame == player2.attackH.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1136,7 +1138,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::groundS) {
                 int groundS2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackS.getAnimSpeed())) % player2.attackS.getFrameCount();
                 auto player2_attackS_sprite = player2.attackS.getSpecificFrame(groundS2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_attackS.get(), &player2_attackS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.attackS.showHitbox(renderer, player2.time_since_last_input);
                 if (groundS2_frame == player2.attackS.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1144,7 +1148,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::airL) {
                 int airL2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackL.getAnimSpeed())) % player2.air_attackL.getFrameCount();
                 auto player2_airL_sprite = player2.air_attackL.getSpecificFrame(airL2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_airL.get(), &player2_airL_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.air_attackL.showHitbox(renderer, player2.time_since_last_input);
                 if (airL2_frame == player2.air_attackL.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1152,7 +1158,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::airM) {
                 int airM2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackM.getAnimSpeed())) % player2.air_attackM.getFrameCount();
                 auto player2_airM_sprite = player2.air_attackM.getSpecificFrame(airM2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_airM.get(), &player2_airM_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.air_attackM.showHitbox(renderer, player2.time_since_last_input);
                 if (airM2_frame == player2.air_attackM.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1160,7 +1168,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::airH) {
                 int airH2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackH.getAnimSpeed())) % player2.air_attackH.getFrameCount();
                 auto player2_airH_sprite = player2.air_attackH.getSpecificFrame(airH2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_airH.get(), &player2_airH_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.air_attackH.showHitbox(renderer, player2.time_since_last_input);
                 if (airH2_frame == player2.air_attackH.getFrameCount()) {
                     player2.is_attacking = false;
                 }
@@ -1168,7 +1178,9 @@ int main(int argc, char *argv[])
             else if (player2.currentAttack == player_t::airS) {
                 int airS2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.air_attackS.getAnimSpeed())) % player2.air_attackS.getFrameCount();
                 auto player2_airS_sprite = player2.air_attackS.getSpecificFrame(airS2_frame);
+
                 SDL_RenderCopyEx(renderer, player2_airS.get(), &player2_airS_sprite, &player2_rect, 0, NULL, SDL_FLIP_HORIZONTAL);
+                player2.air_attackS.showHitbox(renderer, player2.time_since_last_input);
                 if (airS2_frame == player2.air_attackS.getFrameCount()) {
                     player2.is_attacking = false;
                 }
