@@ -26,8 +26,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="hitboxes + health bar probably done, now we implement collision with the player and other hitboxes and THEN hurt/dead animations">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="sending some CLion configs, hope it works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" beforeDir="false" afterPath="$PROJECT_DIR$/PEPPINO Sprites/fall/fall.bmp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -112,6 +113,11 @@
   }
 }</component>
   <component name="RunManager" selected="CMake Application.mygame">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="SDL2-static" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="mygame" TARGET_NAME="SDL2-static" CONFIG_NAME="Debug">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -193,7 +199,8 @@
       <workItem from="1718435723566" duration="39014000" />
       <workItem from="1718523523164" duration="26965000" />
       <workItem from="1718636671110" duration="23949000" />
-      <workItem from="1718708202953" duration="3232000" />
+      <workItem from="1718708202953" duration="12829000" />
+      <workItem from="1718738402581" duration="16869000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -275,7 +282,23 @@
       <option name="project" value="LOCAL" />
       <updated>1718672863143</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="basic collision is done, still need hitbox interaction, getting hit and dealing damage and THEN hurt/dead animations">
+      <option name="closed" value="true" />
+      <created>1718711893688</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1718711893688</updated>
+    </task>
+    <task id="LOCAL-00012" summary="sending some CLion configs, hope it works">
+      <option name="closed" value="true" />
+      <created>1718713053521</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1718713053521</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -309,6 +332,8 @@
     <MESSAGE value="wonky implementation of attack buttons, still have to separate them somehow&#10;after that we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
     <MESSAGE value="attack buttons have been separated&#10;now we add hitboxes, damage, maybe hitstun and THEN hurt/dead animations" />
     <MESSAGE value="hitboxes + health bar probably done, now we implement collision with the player and other hitboxes and THEN hurt/dead animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="hitboxes + health bar probably done, now we implement collision with the player and other hitboxes and THEN hurt/dead animations" />
+    <MESSAGE value="basic collision is done, still need hitbox interaction, getting hit and dealing damage and THEN hurt/dead animations" />
+    <MESSAGE value="sending some CLion configs, hope it works" />
+    <option name="LAST_COMMIT_MESSAGE" value="sending some CLion configs, hope it works" />
   </component>
 </project>
