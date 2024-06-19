@@ -26,7 +26,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="hurt animations and hitboxes work kind of, not sure how to make the hitboxes track the player rectangle yet&#10;also still not sure how to make the players lose health AND for it to show on the screen">
+    <list default="true" id="75e5e62e-65b0-490d-93fb-5c5eac81d080" name="Changes" comment="filled out all the comments I could muster">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/mygame.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/mygame.cpp" afterDir="false" />
     </list>
@@ -132,6 +132,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="mygame" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="mygame" TARGET_NAME="mygame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="mygame" RUN_TARGET_NAME="mygame">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -195,7 +200,7 @@
       <workItem from="1718636671110" duration="23949000" />
       <workItem from="1718708202953" duration="12829000" />
       <workItem from="1718738402581" duration="17049000" />
-      <workItem from="1718778980865" duration="7733000" />
+      <workItem from="1718778980865" duration="14460000" />
     </task>
     <task id="LOCAL-00001" summary="hopefully the initial commit, still player rects and collision to do, then we can move on to animations, then applying to buttons, then hitboxes and guard states, hopefully">
       <option name="closed" value="true" />
@@ -301,7 +306,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718762800821</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="filled out all the comments I could muster">
+      <option name="closed" value="true" />
+      <created>1718787671184</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1718787671184</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -338,6 +351,7 @@
     <MESSAGE value="basic collision is done, still need hitbox interaction, getting hit and dealing damage and THEN hurt/dead animations" />
     <MESSAGE value="sending some CLion configs, hope it works" />
     <MESSAGE value="hurt animations and hitboxes work kind of, not sure how to make the hitboxes track the player rectangle yet&#10;also still not sure how to make the players lose health AND for it to show on the screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="hurt animations and hitboxes work kind of, not sure how to make the hitboxes track the player rectangle yet&#10;also still not sure how to make the players lose health AND for it to show on the screen" />
+    <MESSAGE value="filled out all the comments I could muster" />
+    <option name="LAST_COMMIT_MESSAGE" value="filled out all the comments I could muster" />
   </component>
 </project>
