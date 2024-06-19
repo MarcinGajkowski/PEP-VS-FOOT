@@ -1067,6 +1067,12 @@ int main(int argc, char *argv[])
             player.is_walking_forward = false;
             player.is_walking_backward = false;
             player.is_crouching = false;
+            player.is_jumping = false;
+            player.is_jumping_forward = false;
+            player.is_jumping_backward = false;
+            player.is_falling = false;
+            player.is_falling_forward = false;
+            player.is_falling_backward = false;
             // P1 Lighting
             if (player.currentAttack == player_t::groundL) {
                 // render specific frame based on game time
@@ -1398,6 +1404,12 @@ int main(int argc, char *argv[])
             player2.is_walking_forward = false;
             player2.is_walking_backward = false;
             player2.is_crouching = false;
+            player2.is_jumping = false;
+            player2.is_jumping_forward = false;
+            player2.is_jumping_backward = false;
+            player2.is_falling = false;
+            player2.is_falling_forward = false;
+            player2.is_falling_backward = false;
             // P2 Lighting
             if (player2.currentAttack == player_t::groundL) {
                 int groundL2_frame = (int)floor(player2.time_since_last_input / (1.0/player2.attackL.getAnimSpeed())) % player2.attackL.getFrameCount();
